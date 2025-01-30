@@ -1,11 +1,8 @@
 package client;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.channels.Channels;
 import java.nio.channels.SocketChannel;
 import java.util.Scanner;
 
@@ -15,15 +12,41 @@ public class CryptoWalletClient {
     private static final String SERVER_HOST = "localhost";
 
     private static final int BUFFER_SIZE = 1024;
-    private final ByteBuffer buffer = ByteBuffer.allocateDirect(BUFFER_SIZE);
+    private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
     private static final String QUIT_MESSAGE = "quit";
 
-    public static void main() {
+    private void writeToServer(SocketChannel socketChannel, String message) throws IOException {
+        if (socketChannel == null) {
+            throw new IllegalArgumentException("The socketChannel of the client is null reference!");
+        }
+        if (message == null || message.isBlank()) {
+            throw new IllegalArgumentException("The message the client wants to send is invalid!");
+        }
+
+        buffer.clear();
+        buffer.put(message.getBytes());
+        buffer.flip();
+        socketChannel.write(buffer);
+    }
+
+    private String readFromServer(SocketChannel socketChannel) throws IOException {
+        if (socketChannel == null) {
+            throw new IllegalArgumentException("The socketChannel of the client is null reference!");
+        }
+
+        buffer.clear();
+        socketChannel.read(buffer);
+        buffer.flip();
+
+        return new String(buffer.array(), 0, buffer.position(), "UTF-8");
+    }
+
+    public static void main(String[] args) {
+
+        CryptoWalletClient client = new CryptoWalletClient();
 
         try (SocketChannel socketChannel = SocketChannel.open();
-             BufferedReader reader = new BufferedReader(Channels.newReader(socketChannel, "UTF-8"));
-             PrintWriter writer = new PrintWriter(Channels.newWriter(socketChannel, "UTF-8"), true);
              Scanner scanner = new Scanner(System.in)) {
 
             socketChannel.connect(new InetSocketAddress(SERVER_HOST, SERVER_PORT));
@@ -36,8 +59,8 @@ public class CryptoWalletClient {
                     break;
                 }
 
-                writer.println(clientMessage);
-                String reply = reader.readLine();
+                client.writeToServer(socketChannel, clientMessage);
+                String reply = client.readFromServer(socketChannel);
 
                 System.out.println(reply);
                 System.out.println();
