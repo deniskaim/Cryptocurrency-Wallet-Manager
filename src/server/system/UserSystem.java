@@ -1,0 +1,73 @@
+package server.system;
+
+import exceptions.UserNotFoundException;
+import exceptions.UsernameAlreadyTakenException;
+import exceptions.WrongPasswordException;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+
+public class UserSystem {
+    private static final String FILE_NAME = "CryptoWalletUsersData.txt";
+    private final Map<String, User> mapUsernameAccount = new ConcurrentHashMap<>();
+
+    public UserSystem() {
+        Set<User> registeredUsers = loadSavedRegisteredUsers();
+        for (User user : registeredUsers) {
+            mapUsernameAccount.put(user.username(), user);
+        }
+    }
+
+    public User registrateUser(String username, String password) throws UsernameAlreadyTakenException {
+        if (mapUsernameAccount.containsKey(username)) {
+            throw new UsernameAlreadyTakenException(
+                "There is already an account with this username. Try with another one!");
+        }
+        CryptoWallet wallet = new CryptoWallet();
+        User newUser = new User(username, password, wallet);
+
+        saveUser(newUser);
+        mapUsernameAccount.put(username, newUser);
+        return newUser;
+    }
+
+    public User logInUser(String username, String password) throws UserNotFoundException, WrongPasswordException {
+        if (!mapUsernameAccount.containsKey(username)) {
+            throw new UserNotFoundException("There is no such registered user in the system!");
+        }
+
+        User user = mapUsernameAccount.get(username);
+
+        String actualPassword = user.password();
+        if (actualPassword.equals(password)) {
+            throw new WrongPasswordException("The password is incorrect!");
+        }
+
+        return user;
+    }
+
+
+
+    private Set<User> loadSavedRegisteredUsers() {
+
+        try (ObjectInputStream reader = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            return (Set<User>) reader.readObject();
+        } catch (Exception e) {
+            throw new IllegalArgumentException("A problem occurred while loading the registered users", e);
+        }
+    }
+
+    private void saveUser(User newUser) {
+        try (ObjectOutputStream writer = new ObjectOutputStream(new FileOutputStream(FILE_NAME, true))) {
+            writer.writeObject(newUser);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
