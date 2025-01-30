@@ -25,6 +25,9 @@ public class UserSystem {
     }
 
     public User registrateUser(String username, String password) throws UsernameAlreadyTakenException {
+        validateUsername(username);
+        validatePassword(password);
+
         if (mapUsernameAccount.containsKey(username)) {
             throw new UsernameAlreadyTakenException(
                 "There is already an account with this username. Try with another one!");
@@ -38,6 +41,9 @@ public class UserSystem {
     }
 
     public User logInUser(String username, String password) throws UserNotFoundException, WrongPasswordException {
+        validateUsername(username);
+        validatePassword(password);
+
         if (!mapUsernameAccount.containsKey(username)) {
             throw new UserNotFoundException("There is no such registered user in the system!");
         }
@@ -52,7 +58,17 @@ public class UserSystem {
         return user;
     }
 
+    private void validateUsername(String username) {
+        if (username == null || username.isBlank()) {
+            throw new IllegalArgumentException("Invalid Username for registration!");
+        }
+    }
 
+    private void validatePassword(String password) {
+        if (password == null || password.isBlank()) {
+            throw new IllegalArgumentException("Invalid Password for registration!");
+        }
+    }
 
     private Set<User> loadSavedRegisteredUsers() {
 
@@ -67,7 +83,7 @@ public class UserSystem {
         try (ObjectOutputStream writer = new ObjectOutputStream(new FileOutputStream(FILE_NAME, true))) {
             writer.writeObject(newUser);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Could not save the new user with the already registered users!", e);
         }
     }
 }
