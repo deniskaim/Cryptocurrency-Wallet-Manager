@@ -7,6 +7,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.util.Iterator;
 import java.util.Set;
 
 public class CryptoWalletServer {
@@ -71,12 +72,15 @@ public class CryptoWalletServer {
                 }
 
                 Set<SelectionKey> selectedKeys = selector.selectedKeys();
-                for (SelectionKey selectionKey : selectedKeys) {
-                    if (selectionKey.isAcceptable()) {
-                        handleAcceptableSelectionKey(selectionKey, selector);
-                    } else if (selectionKey.isReadable()) {
+                Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
+                while (keyIterator.hasNext()) {
+                    SelectionKey selectionKey = keyIterator.next();
+                    if (selectionKey.isReadable()) {
                         cryptoWalletServer.handleReadableSelectionKey(selectionKey);
+                    } else if (selectionKey.isAcceptable()) {
+                        handleAcceptableSelectionKey(selectionKey, selector);
                     }
+                    keyIterator.remove();
                 }
             }
         } catch (IOException e) {
