@@ -27,7 +27,7 @@ public class RegisterCommand implements Command {
         try {
             userSystem.registerUser(username, password);
         } catch (UsernameAlreadyTakenException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Log in command is unsuccessful! Please, try with another one");
         }
     }
 }
