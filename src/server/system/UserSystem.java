@@ -24,7 +24,7 @@ public class UserSystem {
         }
     }
 
-    public User registrateUser(String username, String password) throws UsernameAlreadyTakenException {
+    public void registerUser(String username, String password) throws UsernameAlreadyTakenException {
         validateUsername(username);
         validatePassword(password);
 
@@ -37,7 +37,6 @@ public class UserSystem {
 
         saveUser(newUser);
         mapUsernameAccount.put(username, newUser);
-        return newUser;
     }
 
     public User logInUser(String username, String password) throws UserNotFoundException, WrongPasswordException {

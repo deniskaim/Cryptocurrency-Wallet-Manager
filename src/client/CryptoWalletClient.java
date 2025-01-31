@@ -60,9 +60,9 @@ public class CryptoWalletClient {
                 }
 
                 client.writeToServer(socketChannel, clientMessage);
-                String reply = client.readFromServer(socketChannel);
+                String replyFromServer = client.readFromServer(socketChannel);
 
-                System.out.println(reply);
+                System.out.println(replyFromServer);
                 System.out.println();
             }
         } catch (IOException e) {

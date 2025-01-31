@@ -2,7 +2,9 @@ package server.command;
 
 import server.command.hierarchy.Command;
 import server.command.hierarchy.RegisterCommand;
+import server.system.UserSystem;
 
+import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
 import static utils.TextUtils.getSubstringsFromString;
@@ -20,7 +22,30 @@ public class CommandFactory {
     private static final String GET_WALLET_SUMMARY_MESSAGE = "get-wallet-summary";
     private static final String GET_WALLET_OVERALL_SUMMARY_MESSAGE = "get-wallet-overall-summary";
 
-    public static Command createCommand(String commandMessage) {
+    private static CommandFactory instance;
+    private UserSystem userSystem;
+
+    private CommandFactory(UserSystem userSystem) {
+        this.userSystem = userSystem;
+    }
+
+    public static CommandFactory getInstance(UserSystem userSystem) {
+        if (userSystem == null) {
+            throw new IllegalArgumentException("userSystem cannot be null!");
+        }
+        if (instance == null) {
+            instance = new CommandFactory(userSystem);
+        }
+        return instance;
+    }
+
+    public Command createCommand(String commandMessage, SocketChannel socketChannel) {
+        if (socketChannel == null) {
+            throw new IllegalArgumentException("socketChannel cannot be null!");
+        }
+        if (commandMessage == null) {
+            throw new IllegalArgumentException("input cannot be null reference");
+        }
         String[] stringsInCommandMessage = getSubstringsFromString(commandMessage);
 
         String commandSymbol = stringsInCommandMessage[0];
@@ -32,7 +57,7 @@ public class CommandFactory {
         String[] args = Arrays.copyOfRange(stringsInCommandMessage, 2, stringsInCommandMessage.length);
 
         return switch (actualCommandString) {
-            case REGISTER_MESSAGE -> new RegisterCommand(args);
+            case REGISTER_MESSAGE -> new RegisterCommand(args, userSystem);
             // case LOG_IN_MESSAGE -> new
             // case LOG_OUT_MESSAGE -> new
             // case DEPOSIT_MONEY_MESSAGE -> new
