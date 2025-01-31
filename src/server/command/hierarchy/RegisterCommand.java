@@ -7,7 +7,7 @@ public class RegisterCommand implements Command {
 
     public RegisterCommand(String[] args) {
         if (args == null || args.length != 2) {
-            throw new IllegalArgumentException("Register command should include just username and password!")
+            throw new IllegalArgumentException("Register command should include just username and password!");
         }
 
         this.username = args[0];
