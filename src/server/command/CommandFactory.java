@@ -1,9 +1,12 @@
 package server.command;
 
 import server.command.hierarchy.Command;
+import server.command.hierarchy.LogInCommand;
+import server.command.hierarchy.LogOutCommand;
 import server.command.hierarchy.RegisterCommand;
 import server.system.UserSystem;
 
+import java.nio.channels.SelectionKey;
 import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
@@ -39,9 +42,9 @@ public class CommandFactory {
         return instance;
     }
 
-    public Command createCommand(String commandMessage, SocketChannel socketChannel) {
-        if (socketChannel == null) {
-            throw new IllegalArgumentException("socketChannel cannot be null!");
+    public Command createCommand(String commandMessage, SelectionKey selectionKey) {
+        if (selectionKey == null) {
+            throw new IllegalArgumentException("selectionKey cannot be null!");
         }
         if (commandMessage == null) {
             throw new IllegalArgumentException("input cannot be null reference");
@@ -58,8 +61,8 @@ public class CommandFactory {
 
         return switch (actualCommandString) {
             case REGISTER_MESSAGE -> new RegisterCommand(args, userSystem);
-            // case LOG_IN_MESSAGE -> new
-            // case LOG_OUT_MESSAGE -> new
+            case LOG_IN_MESSAGE -> new LogInCommand(args, userSystem, selectionKey);
+            case LOG_OUT_MESSAGE -> new LogOutCommand(args, selectionKey);
             // case DEPOSIT_MONEY_MESSAGE -> new
             // case LIST_OFFERINGS_MESSAGE -> new
             // case BUY_MESSAGE -> new
