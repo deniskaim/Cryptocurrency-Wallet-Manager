@@ -10,4 +10,13 @@ public class TextUtils {
         input = input.trim();
         return input.split(WORD_SEPARATOR);
     }
+
+    public static void main(String[] args) {
+        String input = "$ raboti, molq";
+        String[] result = getSubstringsFromString(input);
+
+        for (String word : result) {
+            System.out.println(word);
+        }
+    }
 }

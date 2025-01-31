@@ -1,5 +1,9 @@
 package server;
 
+import server.command.CommandFactory;
+import server.command.hierarchy.Command;
+import server.system.UserSystem;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -7,6 +11,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Set;
 
@@ -18,22 +23,21 @@ public class CryptoWalletServer {
     private static final int BUFFER_SIZE = 1024;
     private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
-    private static void configureServerSocket(ServerSocketChannel serverSocketChannel, Selector selector)
+    private final UserSystem userSystem = new UserSystem();
+    private final CommandFactory commandFactory = CommandFactory.getInstance(userSystem);
+    private Selector selector;
+
+    private void configureServerSocket(ServerSocketChannel serverSocketChannel)
         throws IOException {
         if (serverSocketChannel == null) {
             throw new IllegalArgumentException("serverSocketChannel cannot be null reference!");
         }
-        if (selector == null) {
-            throw new IllegalArgumentException("selector cannot be null reference!");
-        }
-
         serverSocketChannel.bind(new InetSocketAddress(SERVER_HOST, SERVER_PORT));
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
     }
 
-    // incoming connections requests from clients
-    private static void handleAcceptableSelectionKey(SelectionKey selectionKey, Selector selector) throws IOException {
+    private void handleAcceptableSelectionKey(SelectionKey selectionKey) throws IOException {
         if (selectionKey == null || !selectionKey.isAcceptable()) {
             throw new IllegalArgumentException("The selectionKey is invalid!");
         }
@@ -44,47 +48,100 @@ public class CryptoWalletServer {
         socketChannel.register(selector, SelectionKey.OP_READ);
     }
 
-    // incoming requests in form of "reading" the client's message
     private void handleReadableSelectionKey(SelectionKey selectionKey) throws IOException {
         if (selectionKey == null || !selectionKey.isReadable()) {
             throw new IllegalArgumentException("The selectionKey is invalid!");
         }
         SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
+        try {
+            String clientMessage = readFromClient(socketChannel);
+            executeCommand(clientMessage, selectionKey);
+        } catch (IllegalStateException _) {
+            return;
+        } catch (IllegalArgumentException e) {
+            String exceptionMessage = e.getMessage();
+            writeToClient(exceptionMessage, (SocketChannel) selectionKey.channel());
+        }
+    }
 
+    private String readFromClient(SocketChannel socketChannel) throws IOException {
         buffer.clear();
-        socketChannel.read(buffer);
+        int resultRead = socketChannel.read(buffer);
+        if (resultRead < 0) {
+            socketChannel.close();
+            throw new IllegalStateException("Read operation is unsuccessful!");
+        }
+
         buffer.flip();
-        String clientMessage = new String(buffer.array(), 0, buffer.position(), "UTF-8");
+        byte[] input = new byte[buffer.remaining()];
+        buffer.get(input);
+
+        return new String(input, StandardCharsets.UTF_8);
+    }
+
+    private void writeToClient(String message, SocketChannel socketChannel) throws IOException {
+        buffer.clear();
+        buffer.put(message.getBytes());
+        buffer.flip();
+        socketChannel.write(buffer);
+    }
+
+    private void executeCommand(String clientMessage, SelectionKey selectionKey) throws IOException {
+//        try {
+//            Command commandToExecute = commandFactory.createCommand(clientMessage, selectionKey);
+//            //todo: think about commands returning a successful message which can be sent back to the clients
+//            commandToExecute.execute();
+//        } catch (RuntimeException e) {
+//            String exceptionMessage = e.getMessage();
+//            writeToClient(exceptionMessage, (SocketChannel) selectionKey.channel());
+//        }
+
+        Command commandToExecute = commandFactory.createCommand(clientMessage, selectionKey);
+        System.out.println("COMMAND CREATED");
+        commandToExecute.execute();
 
     }
 
     public static void main(String[] args) {
         CryptoWalletServer cryptoWalletServer = new CryptoWalletServer();
+        cryptoWalletServer.start();
+    }
 
-        try (ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-             Selector selector = Selector.open()) {
-
-            configureServerSocket(serverSocketChannel, selector);
+    private void start() {
+        try (ServerSocketChannel serverSocketChannel = ServerSocketChannel.open()) {
+            selector = Selector.open();
+            configureServerSocket(serverSocketChannel);
             while (true) {
-                int readyChannels = selector.select();
-                if (readyChannels == 0) {
-                    continue;
-                }
-
-                Set<SelectionKey> selectedKeys = selector.selectedKeys();
-                Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
-                while (keyIterator.hasNext()) {
-                    SelectionKey selectionKey = keyIterator.next();
-                    if (selectionKey.isReadable()) {
-                        cryptoWalletServer.handleReadableSelectionKey(selectionKey);
-                    } else if (selectionKey.isAcceptable()) {
-                        handleAcceptableSelectionKey(selectionKey, selector);
+                try {
+                    int readyChannels = selector.select();
+                    if (readyChannels == 0) {
+                        continue;
                     }
-                    keyIterator.remove();
+                    Set<SelectionKey> selectedKeys = selector.selectedKeys();
+                    iterateSelectedKeys(selectedKeys);
+                } catch (IOException e) {
+                    System.out.println("Error occurred while processing client request: " + e.getMessage());
                 }
             }
         } catch (IOException e) {
             throw new RuntimeException("A problem with the server socket has arisen", e);
+        }
+    }
+
+    private void iterateSelectedKeys(Set<SelectionKey> selectedKeys) throws IOException {
+        Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
+        while (keyIterator.hasNext()) {
+            SelectionKey selectionKey = keyIterator.next();
+
+            if (selectionKey.isReadable()) {
+                handleReadableSelectionKey(selectionKey);
+                if (!selectionKey.channel().isOpen()) {
+                    continue;
+                }
+            } else if (selectionKey.isAcceptable()) {
+                handleAcceptableSelectionKey(selectionKey);
+            }
+            keyIterator.remove();
         }
     }
 }

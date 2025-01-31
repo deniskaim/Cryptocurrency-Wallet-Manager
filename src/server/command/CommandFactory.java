@@ -1,6 +1,7 @@
 package server.command;
 
 import server.command.hierarchy.Command;
+import server.command.hierarchy.DisconnectCommand;
 import server.command.hierarchy.LogInCommand;
 import server.command.hierarchy.LogOutCommand;
 import server.command.hierarchy.RegisterCommand;
@@ -18,6 +19,7 @@ public class CommandFactory {
     private static final String REGISTER_MESSAGE = "register";
     private static final String LOG_IN_MESSAGE = "login";
     private static final String LOG_OUT_MESSAGE = "logout";
+    private static final String DISCONNECT_MESSAGE = "disconnect";
     private static final String DEPOSIT_MONEY_MESSAGE = "deposit-money";
     private static final String LIST_OFFERINGS_MESSAGE = "list-offerings";
     private static final String BUY_MESSAGE = "buy";
@@ -63,6 +65,7 @@ public class CommandFactory {
             case REGISTER_MESSAGE -> new RegisterCommand(args, userSystem);
             case LOG_IN_MESSAGE -> new LogInCommand(args, userSystem, selectionKey);
             case LOG_OUT_MESSAGE -> new LogOutCommand(args, selectionKey);
+            case DISCONNECT_MESSAGE -> new DisconnectCommand(args, selectionKey);
             // case DEPOSIT_MONEY_MESSAGE -> new
             // case LIST_OFFERINGS_MESSAGE -> new
             // case BUY_MESSAGE -> new

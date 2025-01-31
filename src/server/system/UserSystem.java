@@ -5,11 +5,13 @@ import exceptions.UsernameAlreadyTakenException;
 import exceptions.WrongPasswordException;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -73,8 +75,10 @@ public class UserSystem {
 
         try (ObjectInputStream reader = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
             return (Set<User>) reader.readObject();
-        } catch (Exception e) {
-            throw new IllegalArgumentException("A problem occurred while loading the registered users", e);
+        } catch (FileNotFoundException e) {
+            return new HashSet<>();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new IllegalArgumentException("A problem occurred while loading the registered users!");
         }
     }
 

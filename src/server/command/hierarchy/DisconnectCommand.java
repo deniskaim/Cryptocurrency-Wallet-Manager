@@ -1,14 +1,14 @@
 package server.command.hierarchy;
 
-import server.system.User;
-
+import java.io.IOException;
 import java.nio.channels.SelectionKey;
+import java.nio.channels.SocketChannel;
 
-public class LogOutCommand implements Command {
+public class DisconnectCommand implements Command {
 
     private final SelectionKey selectionKey;
 
-    public LogOutCommand(String[] args, SelectionKey selectionKey) {
+    public DisconnectCommand(String[] args, SelectionKey selectionKey) {
         if (args == null || args.length != 0) {
             throw new IllegalArgumentException("LogOut command should not include extra words!");
         }
@@ -20,10 +20,12 @@ public class LogOutCommand implements Command {
 
     @Override
     public void execute() {
-        User user = (User) selectionKey.attachment();
-        if (user == null) {
-            throw new IllegalStateException("Log out cannot happen before logging in!");
+        SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
+        try {
+            socketChannel.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Could not close the socket", e);
         }
-        selectionKey.attach(null);
     }
+
 }

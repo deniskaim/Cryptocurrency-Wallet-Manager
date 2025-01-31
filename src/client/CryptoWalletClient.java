@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 
 public class CryptoWalletClient {
@@ -13,8 +14,6 @@ public class CryptoWalletClient {
 
     private static final int BUFFER_SIZE = 1024;
     private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
-
-    private static final String QUIT_MESSAGE = "quit";
 
     private void writeToServer(SocketChannel socketChannel, String message) throws IOException {
         if (socketChannel == null) {
@@ -36,10 +35,16 @@ public class CryptoWalletClient {
         }
 
         buffer.clear();
-        socketChannel.read(buffer);
-        buffer.flip();
+        int resultRead = socketChannel.read(buffer);
+        if (resultRead < 0) {
+            throw new IllegalStateException("Connection closed by server.");
+        }
 
-        return new String(buffer.array(), 0, buffer.position(), "UTF-8");
+        buffer.flip();
+        byte[] input = new byte[buffer.remaining()];
+        buffer.get(input);
+
+        return new String(input, StandardCharsets.UTF_8);
     }
 
     public static void main(String[] args) {
@@ -55,15 +60,16 @@ public class CryptoWalletClient {
                 System.out.println("Enter the desired command: ");
                 String clientMessage = scanner.nextLine();
 
-                if (clientMessage.equals(QUIT_MESSAGE)) {
+                try {
+                    client.writeToServer(socketChannel, clientMessage);
+                    String replyFromServer = client.readFromServer(socketChannel);
+                    System.out.println(replyFromServer);
+                    System.out.println();
+                } catch (RuntimeException e) {
+                    System.out.println(e.getMessage());
                     break;
                 }
 
-                client.writeToServer(socketChannel, clientMessage);
-                String replyFromServer = client.readFromServer(socketChannel);
-
-                System.out.println(replyFromServer);
-                System.out.println();
             }
         } catch (IOException e) {
             throw new RuntimeException("There is a problem with the network communication", e);
