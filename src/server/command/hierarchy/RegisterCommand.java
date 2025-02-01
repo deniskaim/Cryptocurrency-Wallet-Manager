@@ -9,6 +9,8 @@ public class RegisterCommand implements Command {
     private final String password;
     private final UserSystem userSystem;
 
+    private static final String SUCCESSFUL_MESSAGE = "You have successfully registered in the system";
+
     public RegisterCommand(String[] args, UserSystem userSystem) {
         if (args == null || args.length != 2) {
             throw new IllegalArgumentException("Register command should include just username and password!");
@@ -23,11 +25,12 @@ public class RegisterCommand implements Command {
     }
 
     @Override
-    public void execute() {
+    public String execute() {
         try {
             userSystem.registerUser(username, password);
+            return SUCCESSFUL_MESSAGE;
         } catch (UsernameAlreadyTakenException e) {
-            throw new RuntimeException("Log in command is unsuccessful! Please, try with another one");
+            throw new RuntimeException("Register command is unsuccessful! Please, try with another username! This one is already taken!");
         }
     }
 }

@@ -28,7 +28,7 @@ public class CommandFactory {
     private static final String GET_WALLET_OVERALL_SUMMARY_MESSAGE = "get-wallet-overall-summary";
 
     private static CommandFactory instance;
-    private UserSystem userSystem;
+    private final UserSystem userSystem;
 
     private CommandFactory(UserSystem userSystem) {
         this.userSystem = userSystem;

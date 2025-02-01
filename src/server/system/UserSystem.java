@@ -4,6 +4,7 @@ import exceptions.UserNotFoundException;
 import exceptions.UsernameAlreadyTakenException;
 import exceptions.WrongPasswordException;
 
+import java.io.EOFException;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -52,7 +53,7 @@ public class UserSystem {
         User user = mapUsernameAccount.get(username);
 
         String actualPassword = user.password();
-        if (actualPassword.equals(password)) {
+        if (!actualPassword.equals(password)) {
             throw new WrongPasswordException("The password is incorrect!");
         }
 
@@ -73,12 +74,21 @@ public class UserSystem {
 
     private Set<User> loadSavedRegisteredUsers() {
 
+        Set<User> usersFromFile = new HashSet<>();
         try (ObjectInputStream reader = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
-            return (Set<User>) reader.readObject();
+            while (true) {
+                try {
+                    User currentUser = (User) reader.readObject();
+                    usersFromFile.add(currentUser);
+                } catch (EOFException e) {
+                    break;
+                }
+            }
+            return usersFromFile;
         } catch (FileNotFoundException e) {
-            return new HashSet<>();
+            return usersFromFile;
         } catch (IOException | ClassNotFoundException e) {
-            throw new IllegalArgumentException("A problem occurred while loading the registered users!");
+            throw new RuntimeException("A problem occurred while loading the registered users!", e);
         }
     }
 

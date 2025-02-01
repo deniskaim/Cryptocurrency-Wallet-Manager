@@ -7,6 +7,7 @@ import java.nio.channels.SelectionKey;
 public class LogOutCommand implements Command {
 
     private final SelectionKey selectionKey;
+    private static final String SUCCESSFUL_MESSAGE = "You have successfully logged out";
 
     public LogOutCommand(String[] args, SelectionKey selectionKey) {
         if (args == null || args.length != 0) {
@@ -19,11 +20,12 @@ public class LogOutCommand implements Command {
     }
 
     @Override
-    public void execute() {
+    public String execute() {
         User user = (User) selectionKey.attachment();
         if (user == null) {
             throw new IllegalStateException("Log out cannot happen before logging in!");
         }
         selectionKey.attach(null);
+        return SUCCESSFUL_MESSAGE;
     }
 }

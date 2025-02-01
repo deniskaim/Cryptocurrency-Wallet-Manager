@@ -7,6 +7,7 @@ import java.nio.channels.SocketChannel;
 public class DisconnectCommand implements Command {
 
     private final SelectionKey selectionKey;
+    private static final String SUCCESSFUL_MESSAGE = "You have been disconnected from the server!";
 
     public DisconnectCommand(String[] args, SelectionKey selectionKey) {
         if (args == null || args.length != 0) {
@@ -19,10 +20,11 @@ public class DisconnectCommand implements Command {
     }
 
     @Override
-    public void execute() {
+    public String execute() {
         SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
         try {
             socketChannel.close();
+            return SUCCESSFUL_MESSAGE;
         } catch (IOException e) {
             throw new RuntimeException("Could not close the socket", e);
         }
