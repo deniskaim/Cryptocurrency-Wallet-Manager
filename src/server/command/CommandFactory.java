@@ -1,6 +1,7 @@
 package server.command;
 
 import server.command.hierarchy.Command;
+import server.command.hierarchy.DepositMoneyCommand;
 import server.command.hierarchy.DisconnectCommand;
 import server.command.hierarchy.LogInCommand;
 import server.command.hierarchy.LogOutCommand;
@@ -57,7 +58,6 @@ public class CommandFactory {
         if (!commandSymbol.equals(COMMAND_SYMBOL)) {
             throw new IllegalArgumentException("Invalid begin symbol for a command message!");
         }
-
         String actualCommandString = stringsInCommandMessage[1];
         String[] args = Arrays.copyOfRange(stringsInCommandMessage, 2, stringsInCommandMessage.length);
 
@@ -66,7 +66,7 @@ public class CommandFactory {
             case LOG_IN_MESSAGE -> new LogInCommand(args, userSystem, selectionKey);
             case LOG_OUT_MESSAGE -> new LogOutCommand(args, selectionKey);
             case DISCONNECT_MESSAGE -> new DisconnectCommand(args, selectionKey);
-            // case DEPOSIT_MONEY_MESSAGE -> new
+            case DEPOSIT_MONEY_MESSAGE -> new DepositMoneyCommand(args, selectionKey);
             // case LIST_OFFERINGS_MESSAGE -> new
             // case BUY_MESSAGE -> new
             // case SELL_MESSAGE -> new

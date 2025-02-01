@@ -4,7 +4,6 @@ import exceptions.UserNotFoundException;
 import exceptions.UsernameAlreadyTakenException;
 import exceptions.WrongPasswordException;
 
-import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
 import java.io.File;
 import java.io.FileInputStream;

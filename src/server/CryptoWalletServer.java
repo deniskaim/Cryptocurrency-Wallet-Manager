@@ -1,5 +1,6 @@
 package server;
 
+import exceptions.UserException;
 import server.command.CommandExecutor;
 import server.command.CommandFactory;
 import server.command.hierarchy.Command;
@@ -131,7 +132,7 @@ public class CryptoWalletServer {
             if (selectionKey.channel().isOpen()) {
                 writeToClient(successfulMessage, (SocketChannel) selectionKey.channel());
             }
-        } catch (RuntimeException e) {
+        } catch (RuntimeException | UserException e) {
             String exceptionMessage = e.getMessage();
             writeToClient(exceptionMessage, (SocketChannel) selectionKey.channel());
         }

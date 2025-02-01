@@ -1,5 +1,6 @@
 package server.command.hierarchy;
 
+import exceptions.NotLoggedInException;
 import server.system.User;
 
 import java.nio.channels.SelectionKey;
@@ -20,10 +21,10 @@ public class LogOutCommand implements Command {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws NotLoggedInException {
         User user = (User) selectionKey.attachment();
         if (user == null) {
-            throw new IllegalStateException("Log out cannot happen before logging in!");
+            throw new NotLoggedInException("Log out cannot happen before logging in!");
         }
         selectionKey.attach(null);
         return SUCCESSFUL_MESSAGE;

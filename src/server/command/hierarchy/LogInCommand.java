@@ -1,5 +1,6 @@
 package server.command.hierarchy;
 
+import exceptions.AlreadyLoggedInException;
 import exceptions.UserNotFoundException;
 import exceptions.WrongPasswordException;
 import server.system.User;
@@ -34,11 +35,12 @@ public class LogInCommand implements Command {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws AlreadyLoggedInException {
         if (selectionKey.attachment() != null) {
-            throw new IllegalStateException(
+            throw new AlreadyLoggedInException(
                 "Log in is only possible if the user hasn't logged in any account beforehand!");
         }
+
         try {
             User loggedInUser = userSystem.logInUser(username, password);
             selectionKey.attach(loggedInUser);

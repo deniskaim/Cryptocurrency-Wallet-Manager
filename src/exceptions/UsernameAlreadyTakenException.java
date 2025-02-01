@@ -1,6 +1,6 @@
 package exceptions;
 
-public class UsernameAlreadyTakenException extends Exception {
+public class UsernameAlreadyTakenException extends UserException {
     public UsernameAlreadyTakenException(String message) {
         super(message);
     }
