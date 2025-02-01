@@ -4,7 +4,9 @@ import exceptions.UserNotFoundException;
 import exceptions.UsernameAlreadyTakenException;
 import exceptions.WrongPasswordException;
 
+import java.io.ByteArrayOutputStream;
 import java.io.EOFException;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -93,8 +95,23 @@ public class UserSystem {
     }
 
     private void saveUser(User newUser) {
-        try (ObjectOutputStream writer = new ObjectOutputStream(new FileOutputStream(FILE_NAME, true))) {
-            writer.writeObject(newUser);
+        try {
+            File file = new File(FILE_NAME);
+            if (!file.exists()) {
+                try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+                    objectOutputStream.writeObject(newUser);
+                }
+            } else {
+                try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(
+                    new FileOutputStream(FILE_NAME, true)) {
+                    @Override
+                    protected void writeStreamHeader() throws IOException {
+
+                    }
+                }) {
+                    objectOutputStream.writeObject(newUser);
+                }
+            }
         } catch (IOException e) {
             throw new RuntimeException("Could not save the new user with the already registered users!", e);
         }
