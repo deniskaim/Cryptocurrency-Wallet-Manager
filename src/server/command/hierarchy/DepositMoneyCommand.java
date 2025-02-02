@@ -1,7 +1,7 @@
 package server.command.hierarchy;
 
 import exceptions.NotLoggedInException;
-import server.system.User;
+import server.system.user.User;
 
 import java.nio.channels.SelectionKey;
 

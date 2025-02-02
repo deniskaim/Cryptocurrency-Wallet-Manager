@@ -20,14 +20,16 @@ public class DisconnectCommand implements Command {
     }
 
     @Override
-    public String execute() {
+    public String execute() throws IOException {
         SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
-        try {
-            socketChannel.close();
-            return SUCCESSFUL_MESSAGE;
-        } catch (IOException e) {
-            throw new RuntimeException("Could not close the socket", e);
-        }
+        socketChannel.close();
+        return SUCCESSFUL_MESSAGE;
+//        try {
+//            socketChannel.close();
+//            return SUCCESSFUL_MESSAGE;
+//        } catch (IOException e) {
+//            throw new RuntimeException("Could not close the socket", e);
+//        }
     }
 
 }

@@ -4,7 +4,8 @@ import exceptions.UserException;
 import server.command.CommandExecutor;
 import server.command.CommandFactory;
 import server.command.hierarchy.Command;
-import server.system.UserSystem;
+import server.system.UserAccountService;
+import server.system.UserRepository;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -25,8 +26,7 @@ public class CryptoWalletServer {
     private static final int BUFFER_SIZE = 1024;
     private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
-    private final UserSystem userSystem = new UserSystem();
-    private final CommandFactory commandFactory = CommandFactory.getInstance(userSystem);
+    private final CommandFactory commandFactory = createCommandFactory();
     private final CommandExecutor commandExecutor = new CommandExecutor();
     private Selector selector;
 
@@ -132,9 +132,16 @@ public class CryptoWalletServer {
             if (selectionKey.channel().isOpen()) {
                 writeToClient(successfulMessage, (SocketChannel) selectionKey.channel());
             }
-        } catch (RuntimeException | UserException e) {
+        } catch (Exception e) {
             String exceptionMessage = e.getMessage();
             writeToClient(exceptionMessage, (SocketChannel) selectionKey.channel());
         }
+    }
+
+    private CommandFactory createCommandFactory() {
+        UserRepository userRepository = new UserRepository();
+        UserAccountService userAccountService = new UserAccountService(userRepository);
+
+        return CommandFactory.getInstance(userAccountService);
     }
 }

@@ -1,4 +1,4 @@
-package server.system;
+package server.system.user;
 
 import java.io.Serializable;
 

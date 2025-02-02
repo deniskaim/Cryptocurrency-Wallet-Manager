@@ -6,10 +6,10 @@ import server.command.hierarchy.DisconnectCommand;
 import server.command.hierarchy.LogInCommand;
 import server.command.hierarchy.LogOutCommand;
 import server.command.hierarchy.RegisterCommand;
-import server.system.UserSystem;
+import server.system.UserAccountService;
+import server.system.UserRepository;
 
 import java.nio.channels.SelectionKey;
-import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
 import static utils.TextUtils.getSubstringsFromString;
@@ -29,41 +29,40 @@ public class CommandFactory {
     private static final String GET_WALLET_OVERALL_SUMMARY_MESSAGE = "get-wallet-overall-summary";
 
     private static CommandFactory instance;
-    private final UserSystem userSystem;
+    private final UserAccountService userAccountService;
 
-    private CommandFactory(UserSystem userSystem) {
-        this.userSystem = userSystem;
+    private CommandFactory(UserAccountService userAccountService) {
+        if (userAccountService == null) {
+            throw new IllegalArgumentException("userAccountService cannot be null reference!");
+        }
+        this.userAccountService = userAccountService;
     }
 
-    public static CommandFactory getInstance(UserSystem userSystem) {
-        if (userSystem == null) {
-            throw new IllegalArgumentException("userSystem cannot be null!");
-        }
+    public static CommandFactory getInstance(UserAccountService userAccountService) {
         if (instance == null) {
-            instance = new CommandFactory(userSystem);
+            instance = new CommandFactory(userAccountService);
         }
         return instance;
     }
 
     public Command createCommand(String commandMessage, SelectionKey selectionKey) {
-        if (selectionKey == null) {
-            throw new IllegalArgumentException("selectionKey cannot be null!");
-        }
         if (commandMessage == null) {
             throw new IllegalArgumentException("input cannot be null reference");
+        }
+        if (selectionKey == null) {
+            throw new IllegalArgumentException("selectionKey cannot be null!");
         }
         String[] stringsInCommandMessage = getSubstringsFromString(commandMessage);
 
         String commandSymbol = stringsInCommandMessage[0];
-        if (!commandSymbol.equals(COMMAND_SYMBOL)) {
-            throw new IllegalArgumentException("Invalid begin symbol for a command message!");
-        }
+        validateCommandSymbol(commandSymbol);
+
         String actualCommandString = stringsInCommandMessage[1];
         String[] args = Arrays.copyOfRange(stringsInCommandMessage, 2, stringsInCommandMessage.length);
 
         return switch (actualCommandString) {
-            case REGISTER_MESSAGE -> new RegisterCommand(args, userSystem);
-            case LOG_IN_MESSAGE -> new LogInCommand(args, userSystem, selectionKey);
+            case REGISTER_MESSAGE -> new RegisterCommand(args, userAccountService);
+            case LOG_IN_MESSAGE -> new LogInCommand(args, userAccountService, selectionKey);
             case LOG_OUT_MESSAGE -> new LogOutCommand(args, selectionKey);
             case DISCONNECT_MESSAGE -> new DisconnectCommand(args, selectionKey);
             case DEPOSIT_MONEY_MESSAGE -> new DepositMoneyCommand(args, selectionKey);
@@ -74,5 +73,11 @@ public class CommandFactory {
             // case GET_WALLET_OVERALL_SUMMARY_MESSAGE -> new
             default -> throw new IllegalArgumentException("That is an invalid command. Try again!");
         };
+    }
+
+    private void validateCommandSymbol(String commandSymbol) {
+        if (!commandSymbol.equals(COMMAND_SYMBOL)) {
+            throw new IllegalArgumentException("Invalid begin symbol for a command message!");
+        }
     }
 }
