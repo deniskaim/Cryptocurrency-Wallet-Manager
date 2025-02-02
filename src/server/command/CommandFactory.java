@@ -6,6 +6,7 @@ import server.command.hierarchy.DisconnectCommand;
 import server.command.hierarchy.LogInCommand;
 import server.command.hierarchy.LogOutCommand;
 import server.command.hierarchy.RegisterCommand;
+import server.system.CryptoWalletService;
 import server.system.UserAccountService;
 import server.system.UserRepository;
 
@@ -30,17 +31,23 @@ public class CommandFactory {
 
     private static CommandFactory instance;
     private final UserAccountService userAccountService;
+    private final CryptoWalletService cryptoWalletService;
 
-    private CommandFactory(UserAccountService userAccountService) {
+    private CommandFactory(UserAccountService userAccountService, CryptoWalletService cryptoWalletService) {
         if (userAccountService == null) {
             throw new IllegalArgumentException("userAccountService cannot be null reference!");
         }
+        if (cryptoWalletService == null) {
+            throw new IllegalArgumentException("cryptoWalletService cannot be null reference!");
+        }
         this.userAccountService = userAccountService;
+        this.cryptoWalletService = cryptoWalletService;
     }
 
-    public static CommandFactory getInstance(UserAccountService userAccountService) {
+    public static CommandFactory getInstance(UserAccountService userAccountService,
+                                             CryptoWalletService cryptoWalletService) {
         if (instance == null) {
-            instance = new CommandFactory(userAccountService);
+            instance = new CommandFactory(userAccountService, cryptoWalletService);
         }
         return instance;
     }
@@ -65,7 +72,7 @@ public class CommandFactory {
             case LOG_IN_MESSAGE -> new LogInCommand(args, userAccountService, selectionKey);
             case LOG_OUT_MESSAGE -> new LogOutCommand(args, selectionKey);
             case DISCONNECT_MESSAGE -> new DisconnectCommand(args, selectionKey);
-            case DEPOSIT_MONEY_MESSAGE -> new DepositMoneyCommand(args, selectionKey);
+            case DEPOSIT_MONEY_MESSAGE -> new DepositMoneyCommand(args, cryptoWalletService, selectionKey);
             // case LIST_OFFERINGS_MESSAGE -> new
             // case BUY_MESSAGE -> new
             // case SELL_MESSAGE -> new

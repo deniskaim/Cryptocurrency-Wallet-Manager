@@ -10,4 +10,10 @@ public class CryptoWallet implements Serializable {
     public void depositMoney(double amountToAdd) {
         balance += amountToAdd;
     }
+
+    public double getBalance() {
+        return balance;
+    }
+
+
 }

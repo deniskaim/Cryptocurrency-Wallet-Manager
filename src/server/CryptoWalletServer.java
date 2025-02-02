@@ -4,6 +4,7 @@ import exceptions.UserException;
 import server.command.CommandExecutor;
 import server.command.CommandFactory;
 import server.command.hierarchy.Command;
+import server.system.CryptoWalletService;
 import server.system.UserAccountService;
 import server.system.UserRepository;
 
@@ -142,6 +143,7 @@ public class CryptoWalletServer {
         UserRepository userRepository = new UserRepository();
         UserAccountService userAccountService = new UserAccountService(userRepository);
 
-        return CommandFactory.getInstance(userAccountService);
+        CryptoWalletService cryptoWalletService = new CryptoWalletService();
+        return CommandFactory.getInstance(userAccountService, cryptoWalletService);
     }
 }
