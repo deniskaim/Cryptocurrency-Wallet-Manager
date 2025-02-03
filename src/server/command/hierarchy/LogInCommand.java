@@ -3,9 +3,8 @@ package server.command.hierarchy;
 import exceptions.AlreadyLoggedInException;
 import exceptions.UserNotFoundException;
 import exceptions.WrongPasswordException;
-import server.system.UserAccountService;
+import server.system.user.UserAccountService;
 import server.system.user.User;
-import server.system.UserRepository;
 
 import java.nio.channels.SelectionKey;
 
@@ -45,17 +44,5 @@ public class LogInCommand implements Command {
         User loggedInUser = userAccountService.logInUser(username, password);
         selectionKey.attach(loggedInUser);
         return String.format(SUCCESSFUL_MESSAGE, username);
-
-//        try {
-//            User loggedInUser = userAccountService.logInUser(username, password);
-//            selectionKey.attach(loggedInUser);
-//            return String.format(SUCCESSFUL_MESSAGE, username);
-//        } catch (UserNotFoundException e) {
-//            throw new RuntimeException(
-//                "Log in command is unsuccessful! There is no registered user with this username!",
-//                e);
-//        } catch (WrongPasswordException e) {
-//            throw new RuntimeException("Log in command is unsuccessful! The password is incorrect!", e);
-//        }
     }
 }

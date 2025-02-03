@@ -1,8 +1,12 @@
 package server.system.user;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public record User(AuthenticationData authenticationData, CryptoWallet cryptoWallet) implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1234567891234567L;
 
     public static User of(AuthenticationData authenticationData, CryptoWallet cryptoWallet) {
         if (authenticationData == null) {

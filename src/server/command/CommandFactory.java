@@ -3,12 +3,12 @@ package server.command;
 import server.command.hierarchy.Command;
 import server.command.hierarchy.DepositMoneyCommand;
 import server.command.hierarchy.DisconnectCommand;
+import server.command.hierarchy.ListOfferingsCommand;
 import server.command.hierarchy.LogInCommand;
 import server.command.hierarchy.LogOutCommand;
 import server.command.hierarchy.RegisterCommand;
-import server.system.CryptoWalletService;
-import server.system.UserAccountService;
-import server.system.UserRepository;
+import server.system.cryptowallet.CryptoWalletService;
+import server.system.user.UserAccountService;
 
 import java.nio.channels.SelectionKey;
 import java.util.Arrays;
@@ -73,7 +73,7 @@ public class CommandFactory {
             case LOG_OUT_MESSAGE -> new LogOutCommand(args, selectionKey);
             case DISCONNECT_MESSAGE -> new DisconnectCommand(args, selectionKey);
             case DEPOSIT_MONEY_MESSAGE -> new DepositMoneyCommand(args, cryptoWalletService, selectionKey);
-            // case LIST_OFFERINGS_MESSAGE -> new
+            case LIST_OFFERINGS_MESSAGE -> new ListOfferingsCommand(args, cryptoWalletService, selectionKey);
             // case BUY_MESSAGE -> new
             // case SELL_MESSAGE -> new
             // case GET_WALLET_SUMMARY_MESSAGE -> new

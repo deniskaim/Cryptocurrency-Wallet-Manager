@@ -1,7 +1,7 @@
 package server.command.hierarchy;
 
 import exceptions.NotLoggedInException;
-import server.system.CryptoWalletService;
+import server.system.cryptowallet.CryptoWalletService;
 import server.system.user.User;
 
 import java.nio.channels.SelectionKey;
@@ -27,6 +27,9 @@ public class DepositMoneyCommand implements Command {
 
         try {
             this.amount = Double.parseDouble(args[0]);
+            if (this.amount < 0) {
+                throw new IllegalArgumentException("The amount in the deposit-money command cannot be below 0.00 USD");
+            }
             this.selectionKey = selectionKey;
             this.cryptoWalletService = cryptoWalletService;
         } catch (NumberFormatException e) {

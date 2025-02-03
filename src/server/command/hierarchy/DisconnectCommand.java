@@ -24,12 +24,6 @@ public class DisconnectCommand implements Command {
         SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
         socketChannel.close();
         return SUCCESSFUL_MESSAGE;
-//        try {
-//            socketChannel.close();
-//            return SUCCESSFUL_MESSAGE;
-//        } catch (IOException e) {
-//            throw new RuntimeException("Could not close the socket", e);
-//        }
     }
 
 }

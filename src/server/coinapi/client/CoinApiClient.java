@@ -46,8 +46,12 @@ public class CoinApiClient {
 
     public List<Asset> getAllAssets() throws CryptoClientException {
         List<Asset> assetList = getAssetByPath(PATH_ALL_ASSETS);
-        int countToReturn = min(assetList.size(), MAX_ASSETS_COUNT);
-        return assetList.subList(0, countToReturn);
+        List<Asset> cryptoAssets = assetList.stream()
+            .filter(asset -> asset.typeIsCrypto() == 1 && Double.compare(asset.price(), 0d) == 1)
+            .toList();
+
+        int countToReturn = min(cryptoAssets.size(), MAX_ASSETS_COUNT);
+        return cryptoAssets.subList(0, countToReturn);
     }
 
     public Asset getAsset(String assetID) throws CryptoClientException {

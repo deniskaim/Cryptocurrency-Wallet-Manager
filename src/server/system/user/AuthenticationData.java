@@ -1,8 +1,12 @@
 package server.system.user;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 public record AuthenticationData(String username, String password) implements Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1234567891234567L;
 
     public static AuthenticationData of(String username, String password) {
         if (username == null || username.isBlank()) {

@@ -1,15 +1,16 @@
 package server;
 
-import exceptions.UserException;
+import server.coinapi.client.CoinApiClient;
 import server.command.CommandExecutor;
 import server.command.CommandFactory;
 import server.command.hierarchy.Command;
-import server.system.CryptoWalletService;
-import server.system.UserAccountService;
-import server.system.UserRepository;
+import server.system.cryptowallet.CryptoWalletService;
+import server.system.user.UserAccountService;
+import server.system.user.UserRepository;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.http.HttpClient;
 import java.nio.ByteBuffer;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
@@ -24,7 +25,7 @@ public class CryptoWalletServer {
     public static final int SERVER_PORT = 6666;
     private static final String SERVER_HOST = "localhost";
 
-    private static final int BUFFER_SIZE = 1024;
+    private static final int BUFFER_SIZE = 2048;
     private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
     private final CommandFactory commandFactory = createCommandFactory();
@@ -143,7 +144,10 @@ public class CryptoWalletServer {
         UserRepository userRepository = new UserRepository();
         UserAccountService userAccountService = new UserAccountService(userRepository);
 
-        CryptoWalletService cryptoWalletService = new CryptoWalletService();
+        CoinApiClient coinApiClient =
+            new CoinApiClient(HttpClient.newHttpClient(), "146865f1-12e8-4f3e-b75d-6d793420e4ae");
+        CryptoWalletService cryptoWalletService = new CryptoWalletService(coinApiClient);
+
         return CommandFactory.getInstance(userAccountService, cryptoWalletService);
     }
 }

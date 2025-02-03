@@ -1,8 +1,7 @@
 package server.command.hierarchy;
 
 import exceptions.UsernameAlreadyTakenException;
-import server.system.UserAccountService;
-import server.system.UserRepository;
+import server.system.user.UserAccountService;
 
 public class RegisterCommand implements Command {
 
@@ -27,13 +26,6 @@ public class RegisterCommand implements Command {
 
     @Override
     public String execute() throws UsernameAlreadyTakenException {
-//        try {
-//            userAccountService.registerUser(username, password);
-//            return SUCCESSFUL_MESSAGE;
-//        } catch (UsernameAlreadyTakenException e) {
-//            throw new RuntimeException("Register command is unsuccessful! Please, try with another username! This one is already taken!");
-//        }
-
         userAccountService.registerUser(username, password);
         return SUCCESSFUL_MESSAGE;
     }
