@@ -1,6 +1,6 @@
-package server.command;
+package command;
 
-import server.command.hierarchy.Command;
+import command.hierarchy.Command;
 
 public class CommandExecutor {
 

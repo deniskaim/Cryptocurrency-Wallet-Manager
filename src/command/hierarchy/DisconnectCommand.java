@@ -1,4 +1,4 @@
-package server.command.hierarchy;
+package command.hierarchy;
 
 import java.io.IOException;
 import java.nio.channels.SelectionKey;

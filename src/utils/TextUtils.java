@@ -10,4 +10,20 @@ public class TextUtils {
         input = input.trim();
         return input.split(WORD_SEPARATOR);
     }
+
+    public static String getTheRestOfTheString(String input, String start) {
+        if (input == null) {
+            throw new IllegalArgumentException("input cannot be null reference");
+        }
+        if (start == null) {
+            throw new IllegalArgumentException("start cannot be null reference");
+        }
+
+        int startIndex = input.indexOf(start);
+        if (startIndex == -1) {
+            throw new IllegalArgumentException("start is not in the beginning of the input");
+        }
+
+        return input.substring(startIndex + start.length());
+    }
 }

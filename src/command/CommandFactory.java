@@ -1,12 +1,13 @@
-package server.command;
+package command;
 
-import server.command.hierarchy.Command;
-import server.command.hierarchy.DepositMoneyCommand;
-import server.command.hierarchy.DisconnectCommand;
-import server.command.hierarchy.ListOfferingsCommand;
-import server.command.hierarchy.LogInCommand;
-import server.command.hierarchy.LogOutCommand;
-import server.command.hierarchy.RegisterCommand;
+import command.hierarchy.BuyCommand;
+import command.hierarchy.Command;
+import command.hierarchy.DepositMoneyCommand;
+import command.hierarchy.DisconnectCommand;
+import command.hierarchy.ListOfferingsCommand;
+import command.hierarchy.LogInCommand;
+import command.hierarchy.LogOutCommand;
+import command.hierarchy.RegisterCommand;
 import server.system.cryptowallet.CryptoWalletService;
 import server.system.user.UserAccountService;
 
@@ -74,7 +75,7 @@ public class CommandFactory {
             case DISCONNECT_MESSAGE -> new DisconnectCommand(args, selectionKey);
             case DEPOSIT_MONEY_MESSAGE -> new DepositMoneyCommand(args, cryptoWalletService, selectionKey);
             case LIST_OFFERINGS_MESSAGE -> new ListOfferingsCommand(args, cryptoWalletService, selectionKey);
-            // case BUY_MESSAGE -> new
+            case BUY_MESSAGE -> new BuyCommand(args, cryptoWalletService, selectionKey);
             // case SELL_MESSAGE -> new
             // case GET_WALLET_SUMMARY_MESSAGE -> new
             // case GET_WALLET_OVERALL_SUMMARY_MESSAGE -> new

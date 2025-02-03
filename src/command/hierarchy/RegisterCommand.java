@@ -1,4 +1,4 @@
-package server.command.hierarchy;
+package command.hierarchy;
 
 import exceptions.UsernameAlreadyTakenException;
 import server.system.user.UserAccountService;

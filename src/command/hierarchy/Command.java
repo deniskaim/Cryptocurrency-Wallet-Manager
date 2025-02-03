@@ -1,4 +1,4 @@
-package server.command.hierarchy;
+package command.hierarchy;
 
 public interface Command {
 

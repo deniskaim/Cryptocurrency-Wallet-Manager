@@ -1,4 +1,4 @@
-package server.command.hierarchy;
+package command.hierarchy;
 
 import exceptions.AlreadyLoggedInException;
 import exceptions.UserNotFoundException;

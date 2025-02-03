@@ -1,4 +1,4 @@
-package server.coinapi.dto;
+package coinapi.dto;
 
 import com.google.gson.annotations.SerializedName;
 

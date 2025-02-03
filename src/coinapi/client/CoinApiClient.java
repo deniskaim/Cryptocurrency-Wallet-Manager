@@ -1,10 +1,10 @@
-package server.coinapi.client;
+package coinapi.client;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import exceptions.api.CryptoClientException;
 import exceptions.api.apikey.InvalidApiKeyException;
-import server.coinapi.dto.Asset;
+import coinapi.dto.Asset;
 
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;

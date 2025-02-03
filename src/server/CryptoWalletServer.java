@@ -1,9 +1,9 @@
 package server;
 
-import server.coinapi.client.CoinApiClient;
-import server.command.CommandExecutor;
-import server.command.CommandFactory;
-import server.command.hierarchy.Command;
+import coinapi.client.CoinApiClient;
+import command.CommandExecutor;
+import command.CommandFactory;
+import command.hierarchy.Command;
 import server.system.cryptowallet.CryptoWalletService;
 import server.system.user.UserAccountService;
 import server.system.user.UserRepository;
