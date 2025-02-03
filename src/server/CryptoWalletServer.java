@@ -19,10 +19,12 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class CryptoWalletServer {
 
-    public static final int SERVER_PORT = 7777;
+    public final int serverPort;
     private static final String SERVER_HOST = "localhost";
     private static final String APIKEY = "146865f1-12e8-4f3e-b75d-6d793420e4ae";
 
@@ -30,24 +32,35 @@ public class CryptoWalletServer {
     private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
     private CommandFactory commandFactory;
-    private final CommandExecutor commandExecutor = new CommandExecutor();
+    private final CommandExecutor commandExecutor;
 
     private Selector selector;
+    private boolean isRunning = true;
+
+    public CryptoWalletServer(int port, CommandExecutor commandExecutor) {
+        this.serverPort = port;
+        this.commandExecutor = commandExecutor;
+    }
 
     public static void main(String[] args) {
-        CryptoWalletServer cryptoWalletServer = new CryptoWalletServer();
+        int port = 7777;
+        CryptoWalletServer cryptoWalletServer = new CryptoWalletServer(port, new CommandExecutor());
         cryptoWalletServer.start();
     }
 
-    private void start() {
+    public void start() {
         try (ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-             UserRepository userRepository = new UserRepository()) {
+             UserRepository userRepository = new UserRepository();
+             ExecutorService executor = Executors.newSingleThreadExecutor()) {
+
             selector = Selector.open();
             configureServerSocket(serverSocketChannel);
-
             commandFactory = createCommandFactory(userRepository);
 
-            while (true) {
+            Runnable listenForStopCommandRunnable = new StopServerRunnable(this);
+            executor.submit(listenForStopCommandRunnable);
+
+            while (isRunning) {
                 try {
                     int readyChannels = selector.select();
                     if (readyChannels == 0) {
@@ -66,12 +79,19 @@ public class CryptoWalletServer {
         }
     }
 
+    public void stop() {
+        isRunning = false;
+        if (selector.isOpen()) {
+            selector.wakeup();
+        }
+    }
+
     private void configureServerSocket(ServerSocketChannel serverSocketChannel)
         throws IOException {
         if (serverSocketChannel == null) {
             throw new IllegalArgumentException("serverSocketChannel cannot be null reference!");
         }
-        serverSocketChannel.bind(new InetSocketAddress(SERVER_HOST, SERVER_PORT));
+        serverSocketChannel.bind(new InetSocketAddress(SERVER_HOST, serverPort));
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
     }

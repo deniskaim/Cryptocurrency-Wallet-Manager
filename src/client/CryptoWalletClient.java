@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class CryptoWalletClient {
 
-    private static final int SERVER_PORT = 7777;
+    private final int serverPort;
     private static final String SERVER_HOST = "localhost";
 
     private static final int BUFFER_SIZE = 2048;
@@ -17,22 +17,32 @@ public class CryptoWalletClient {
     private static final String WELCOME_MESSAGE =
         "Welcome to the Cryptocurrency Wallet Manager. Use the command \"help\" to see the functionalities!";
 
+    public CryptoWalletClient(int port) {
+        this.serverPort = port;
+    }
+
     public static void main(String[] args) {
+        int port = 7777;
+        CryptoWalletClient client = new CryptoWalletClient(port);
+        client.start();
+    }
 
-        CryptoWalletClient client = new CryptoWalletClient();
-
+    public void start() {
         try (SocketChannel socketChannel = SocketChannel.open();
              Scanner scanner = new Scanner(System.in)) {
 
-            socketChannel.connect(new InetSocketAddress(SERVER_HOST, SERVER_PORT));
+            socketChannel.connect(new InetSocketAddress(SERVER_HOST, serverPort));
             System.out.println(WELCOME_MESSAGE);
             while (true) {
                 System.out.println("Enter a command: ");
                 String clientMessage = scanner.nextLine();
 
+                if (!socketChannel.isConnected()) {
+                    break;
+                }
                 try {
-                    client.writeToServer(socketChannel, clientMessage);
-                    String replyFromServer = client.readFromServer(socketChannel);
+                    writeToServer(socketChannel, clientMessage);
+                    String replyFromServer = readFromServer(socketChannel);
                     System.out.println(replyFromServer);
                     System.out.println();
                 } catch (IllegalStateException e) {
@@ -44,7 +54,7 @@ public class CryptoWalletClient {
 
             }
         } catch (IOException e) {
-            throw new RuntimeException("There is a problem with the network communication", e);
+            System.out.println("The server has stopped working!");
         }
     }
 
