@@ -9,7 +9,7 @@ import java.util.Scanner;
 
 public class CryptoWalletClient {
 
-    private static final int SERVER_PORT = 6666;
+    private static final int SERVER_PORT = 7777;
     private static final String SERVER_HOST = "localhost";
 
     private static final int BUFFER_SIZE = 2048;

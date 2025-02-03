@@ -22,14 +22,16 @@ import java.util.Set;
 
 public class CryptoWalletServer {
 
-    public static final int SERVER_PORT = 6666;
+    public static final int SERVER_PORT = 7777;
     private static final String SERVER_HOST = "localhost";
+    private static final String APIKEY = "146865f1-12e8-4f3e-b75d-6d793420e4ae";
 
     private static final int BUFFER_SIZE = 2048;
     private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
-    private final CommandFactory commandFactory = createCommandFactory();
+    private CommandFactory commandFactory;
     private final CommandExecutor commandExecutor = new CommandExecutor();
+
     private Selector selector;
 
     public static void main(String[] args) {
@@ -38,9 +40,13 @@ public class CryptoWalletServer {
     }
 
     private void start() {
-        try (ServerSocketChannel serverSocketChannel = ServerSocketChannel.open()) {
+        try (ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
+             UserRepository userRepository = new UserRepository()) {
             selector = Selector.open();
             configureServerSocket(serverSocketChannel);
+
+            commandFactory = createCommandFactory(userRepository);
+
             while (true) {
                 try {
                     int readyChannels = selector.select();
@@ -142,12 +148,11 @@ public class CryptoWalletServer {
         }
     }
 
-    private CommandFactory createCommandFactory() {
-        UserRepository userRepository = new UserRepository();
+    private CommandFactory createCommandFactory(UserRepository userRepository) {
         UserAccountService userAccountService = new UserAccountService(userRepository);
 
         CoinApiClient coinApiClient =
-            new CoinApiClient(HttpClient.newHttpClient(), "146865f1-12e8-4f3e-b75d-6d793420e4ae");
+            new CoinApiClient(HttpClient.newHttpClient(), APIKEY);
         CryptoWalletService cryptoWalletService = new CryptoWalletService(coinApiClient);
 
         return CommandFactory.getInstance(userAccountService, cryptoWalletService);

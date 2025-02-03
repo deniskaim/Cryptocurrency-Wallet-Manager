@@ -4,8 +4,6 @@ import exceptions.WrongPasswordException;
 import user.AuthenticationData;
 import user.User;
 
-import java.io.EOFException;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -15,7 +13,7 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class UserRepository {
+public class UserRepository implements AutoCloseable {
     private static final String FILE_NAME = "CryptoWalletUsersData.txt";
     private final Map<String, User> mapUsernameAccount;
 
@@ -28,7 +26,7 @@ public class UserRepository {
             throw new IllegalArgumentException("user cannot be null reference!");
         }
         mapUsernameAccount.put(user.authenticationData().username(), user);
-        saveUserToFile(user);
+        saveUsersToFile();
     }
 
     public boolean userExists(String username) {
@@ -52,6 +50,12 @@ public class UserRepository {
         return mapUsernameAccount.get(authenticationData.username());
     }
 
+    @Override
+    public void close() {
+        saveUsersToFile();
+    }
+
+    /*
     private Map<String, User> loadSavedRegisteredUsers() {
 
         Map<String, User> usersFromFile = new HashMap<>();
@@ -92,6 +96,30 @@ public class UserRepository {
             }
         } catch (IOException e) {
             throw new RuntimeException("Could not save the new user with the already registered users!", e);
+        }
+    }
+*/
+
+    private Map<String, User> loadSavedRegisteredUsers() {
+        Map<String, User> usersFromFile = new HashMap<>();
+
+        try (ObjectInputStream reader = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+            usersFromFile = (Map<String, User>) reader.readObject();
+        } catch (FileNotFoundException e) {
+            return usersFromFile;
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException("A problem occurred while loading the registered users!", e);
+        }
+        return usersFromFile;
+    }
+
+    private void saveUsersToFile() {
+        try {
+            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+                objectOutputStream.writeObject(mapUsernameAccount);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Could not save the users to the file!", e);
         }
     }
 
