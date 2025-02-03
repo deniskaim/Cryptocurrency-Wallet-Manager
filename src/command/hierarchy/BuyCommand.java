@@ -3,8 +3,9 @@ package command.hierarchy;
 import exceptions.InsufficientFundsException;
 import exceptions.InvalidAssetException;
 import exceptions.NotLoggedInException;
-import server.system.cryptowallet.CryptoWalletService;
-import server.system.user.User;
+import exceptions.api.CryptoClientException;
+import service.cryptowallet.CryptoWalletService;
+import user.User;
 
 import java.nio.channels.SelectionKey;
 
@@ -19,7 +20,7 @@ public class BuyCommand implements Command {
 
     private static final String OFFERING_CODE_INPUT_MESSAGE = "--offering=";
     private static final String MONEY_INPUT_MESSAGE = "--money=";
-    private static final String SUCCESSFUL_MESSAGE = "You have successfully invested %f USD in %s";
+    private static final String SUCCESSFUL_MESSAGE = "You have successfully bought %f of %s";
 
     public BuyCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey) {
         if (args == null || args.length != 2) {
@@ -33,7 +34,12 @@ public class BuyCommand implements Command {
             throw new IllegalArgumentException("selectionKey cannot be null reference!");
         }
 
-        this.assetID = getTheRestOfTheString(args[0], OFFERING_CODE_INPUT_MESSAGE);
+        try {
+            this.assetID = getTheRestOfTheString(args[0], OFFERING_CODE_INPUT_MESSAGE);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Offering code string is invalid", e);
+        }
+
         this.selectionKey = selectionKey;
         this.cryptoWalletService = cryptoWalletService;
         try {
@@ -43,16 +49,19 @@ public class BuyCommand implements Command {
             }
         } catch (NumberFormatException e) {
             throw new RuntimeException("The amount in the buy-money command is not in an appropriate format", e);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Money string is invalid", e);
         }
     }
 
     @Override
-    public String execute() throws NotLoggedInException, InsufficientFundsException, InvalidAssetException {
+    public String execute()
+        throws NotLoggedInException, InsufficientFundsException, InvalidAssetException, CryptoClientException {
         User user = (User) selectionKey.attachment();
         if (user == null) {
             throw new NotLoggedInException("Depositing money cannot happen before logging in!");
         }
-        cryptoWalletService.buyCrypto(amount, assetID, user.cryptoWallet());
-        return String.format(SUCCESSFUL_MESSAGE, amount, assetID);
+        double boughtQuantity = cryptoWalletService.buyCrypto(amount, assetID, user.cryptoWallet());
+        return String.format(SUCCESSFUL_MESSAGE, boughtQuantity, assetID);
     }
 }

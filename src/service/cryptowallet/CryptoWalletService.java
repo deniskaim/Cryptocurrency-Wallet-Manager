@@ -1,11 +1,11 @@
-package server.system.cryptowallet;
+package service.cryptowallet;
 
 import exceptions.InsufficientFundsException;
 import exceptions.InvalidAssetException;
 import exceptions.api.CryptoClientException;
 import coinapi.client.CoinApiClient;
 import coinapi.dto.Asset;
-import server.system.user.CryptoWallet;
+import user.CryptoWallet;
 
 import java.util.List;
 
@@ -36,26 +36,21 @@ public class CryptoWalletService {
         }
     }
 
-    public void buyCrypto(double amountToSpend, String assetID, CryptoWallet cryptoWallet)
-        throws InsufficientFundsException, InvalidAssetException {
+    public double buyCrypto(double amountToSpend, String assetID, CryptoWallet cryptoWallet)
+        throws InsufficientFundsException, InvalidAssetException, CryptoClientException {
         validateCryptoWallet(cryptoWallet);
         if (assetID == null) {
             throw new IllegalArgumentException("assetID cannot be null reference!");
         }
 
-        if (!cryptoWallet.isAbleToSpend(amountToSpend)) {
-            throw new InsufficientFundsException(
-                "The balance in the CryptoWallet is lower than the desired amount to spend");
-        }
-
         Asset asset = getAssetByAssetID(assetID);
-        if (!asset.assetID().equals(assetID)) {
-            throw new InvalidAssetException("There is no asset with this offering_code!");
-        }
+
         double cryptoPrice = asset.price();
         double quantityToBuy = amountToSpend / cryptoPrice;
 
+        cryptoWallet.withdrawMoney(amountToSpend);
         cryptoWallet.addQuantityToWallet(assetID, quantityToBuy);
+        return quantityToBuy;
     }
 
     private void validateCryptoWallet(CryptoWallet cryptoWallet) {
@@ -64,11 +59,13 @@ public class CryptoWalletService {
         }
     }
 
-    private Asset getAssetByAssetID(String assetID) {
+    private Asset getAssetByAssetID(String assetID) throws CryptoClientException, InvalidAssetException {
         try {
             return coinApiClient.getAsset(assetID);
+        } catch (InvalidAssetException e) {
+            throw new RuntimeException("There is no asset with this offering_code!");
         } catch (CryptoClientException e) {
-            throw new RuntimeException("Unsuccessful try to get the asset information from the API!", e);
+            throw new RuntimeException("A problem with the CoinAPI request occurred!");
         }
     }
 }

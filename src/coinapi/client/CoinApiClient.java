@@ -2,6 +2,7 @@ package coinapi.client;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import exceptions.InvalidAssetException;
 import exceptions.api.CryptoClientException;
 import exceptions.api.apikey.InvalidApiKeyException;
 import coinapi.dto.Asset;
@@ -54,11 +55,14 @@ public class CoinApiClient {
         return cryptoAssets.subList(0, countToReturn);
     }
 
-    public Asset getAsset(String assetID) throws CryptoClientException {
+    public Asset getAsset(String assetID) throws CryptoClientException, InvalidAssetException {
         if (assetID == null) {
             throw new IllegalArgumentException("assetID cannot be null reference!");
         }
         List<Asset> assetsList = getAssetByPath(String.format(PATH_SINGLE_ASSET, assetID));
+        if (assetsList.isEmpty()) {
+            throw new InvalidAssetException("There is no such asset!");
+        }
         return assetsList.getFirst();
     }
 

@@ -1,8 +1,11 @@
-package server.system.user;
+package service.account;
 
 import exceptions.UserNotFoundException;
 import exceptions.UsernameAlreadyTakenException;
 import exceptions.WrongPasswordException;
+import user.AuthenticationData;
+import user.CryptoWallet;
+import user.User;
 
 public class UserAccountService {
 

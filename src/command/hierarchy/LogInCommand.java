@@ -3,8 +3,8 @@ package command.hierarchy;
 import exceptions.AlreadyLoggedInException;
 import exceptions.UserNotFoundException;
 import exceptions.WrongPasswordException;
-import server.system.user.UserAccountService;
-import server.system.user.User;
+import service.account.UserAccountService;
+import user.User;
 
 import java.nio.channels.SelectionKey;
 

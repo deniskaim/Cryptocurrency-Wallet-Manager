@@ -1,6 +1,8 @@
-package server.system.user;
+package service.account;
 
 import exceptions.WrongPasswordException;
+import user.AuthenticationData;
+import user.User;
 
 import java.io.EOFException;
 import java.io.File;

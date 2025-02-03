@@ -35,9 +35,11 @@ public class CryptoWalletClient {
                     String replyFromServer = client.readFromServer(socketChannel);
                     System.out.println(replyFromServer);
                     System.out.println();
-                } catch (RuntimeException e) {
+                } catch (IllegalStateException e) {
                     System.out.println(e.getMessage());
                     break;
+                } catch (RuntimeException e) {
+                    System.out.println("Invalid command!");
                 }
 
             }

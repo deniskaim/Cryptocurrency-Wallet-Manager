@@ -4,12 +4,13 @@ import command.hierarchy.BuyCommand;
 import command.hierarchy.Command;
 import command.hierarchy.DepositMoneyCommand;
 import command.hierarchy.DisconnectCommand;
+import command.hierarchy.GetWalletSummary;
 import command.hierarchy.ListOfferingsCommand;
 import command.hierarchy.LogInCommand;
 import command.hierarchy.LogOutCommand;
 import command.hierarchy.RegisterCommand;
-import server.system.cryptowallet.CryptoWalletService;
-import server.system.user.UserAccountService;
+import service.cryptowallet.CryptoWalletService;
+import service.account.UserAccountService;
 
 import java.nio.channels.SelectionKey;
 import java.util.Arrays;
@@ -77,7 +78,7 @@ public class CommandFactory {
             case LIST_OFFERINGS_MESSAGE -> new ListOfferingsCommand(args, cryptoWalletService, selectionKey);
             case BUY_MESSAGE -> new BuyCommand(args, cryptoWalletService, selectionKey);
             // case SELL_MESSAGE -> new
-            // case GET_WALLET_SUMMARY_MESSAGE -> new
+            case GET_WALLET_SUMMARY_MESSAGE -> new GetWalletSummary(args, selectionKey);
             // case GET_WALLET_OVERALL_SUMMARY_MESSAGE -> new
             default -> throw new IllegalArgumentException("That is an invalid command. Try again!");
         };

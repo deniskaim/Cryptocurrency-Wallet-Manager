@@ -1,9 +1,9 @@
 package command.hierarchy;
 
 import exceptions.NotLoggedInException;
-import server.system.cryptowallet.CryptoWalletService;
-import server.system.cryptowallet.Offering;
-import server.system.user.User;
+import service.cryptowallet.CryptoWalletService;
+import service.cryptowallet.Offering;
+import user.User;
 
 import java.nio.channels.SelectionKey;
 import java.util.List;

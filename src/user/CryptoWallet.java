@@ -1,4 +1,4 @@
-package server.system.user;
+package user;
 
 import exceptions.InsufficientFundsException;
 
@@ -11,6 +11,7 @@ public class CryptoWallet implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1234567891234567L;
+    private static final String SUMMARY_MESSAGE = "Wallet Summary:" + System.lineSeparator();
 
     private double balance = 0;
 
@@ -35,6 +36,22 @@ public class CryptoWallet implements Serializable {
         holdings.put(assetID, holdings.getOrDefault(assetID, 0.0d) + boughtQuantity);
     }
 
+    public String getSummary() {
+        StringBuilder summary = new StringBuilder(SUMMARY_MESSAGE);
+        summary.append("Current balance = ").append(balance).append(System.lineSeparator());
+        if (holdings.isEmpty()) {
+            summary.append("There are no crypto holdings.");
+            return summary.toString();
+        }
+
+        for (var entry : holdings.entrySet()) {
+            summary.append("CryptoCurrency: ").append(entry.getKey())
+                .append(", Current Quantity: ").append(entry.getValue())
+                .append(System.lineSeparator());
+        }
+        return summary.toString();
+    }
+
     public double getBalance() {
         return balance;
     }
@@ -43,4 +60,11 @@ public class CryptoWallet implements Serializable {
         return Double.compare(balance, amount) >= 0;
     }
 
+    public void withdrawMoney(double amount) throws InsufficientFundsException {
+        if (!isAbleToSpend(amount)) {
+            throw new InsufficientFundsException(
+                "The balance in the CryptoWallet is lower than the desired amount to spend");
+        }
+        balance -= amount;
+    }
 }

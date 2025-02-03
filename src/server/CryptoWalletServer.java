@@ -4,9 +4,9 @@ import coinapi.client.CoinApiClient;
 import command.CommandExecutor;
 import command.CommandFactory;
 import command.hierarchy.Command;
-import server.system.cryptowallet.CryptoWalletService;
-import server.system.user.UserAccountService;
-import server.system.user.UserRepository;
+import service.cryptowallet.CryptoWalletService;
+import service.account.UserAccountService;
+import service.account.UserRepository;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -51,6 +51,8 @@ public class CryptoWalletServer {
                     iterateSelectedKeys(selectedKeys);
                 } catch (IOException e) {
                     System.out.println("Error occurred while processing client request: " + e.getMessage());
+                } catch (RuntimeException e) {
+                    System.out.println("Client made an invalid request!");
                 }
             }
         } catch (IOException e) {
