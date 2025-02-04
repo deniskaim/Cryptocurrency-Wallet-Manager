@@ -10,6 +10,7 @@ import command.hierarchy.ListOfferingsCommand;
 import command.hierarchy.LogInCommand;
 import command.hierarchy.LogOutCommand;
 import command.hierarchy.RegisterCommand;
+import command.hierarchy.SellCommand;
 import service.cryptowallet.CryptoWalletService;
 import service.account.UserAccountService;
 
@@ -79,7 +80,7 @@ public class CommandFactory {
             case DEPOSIT_MONEY_MESSAGE -> new DepositMoneyCommand(args, cryptoWalletService, selectionKey);
             case LIST_OFFERINGS_MESSAGE -> new ListOfferingsCommand(args, cryptoWalletService, selectionKey);
             case BUY_MESSAGE -> new BuyCommand(args, cryptoWalletService, selectionKey);
-            // case SELL_MESSAGE -> new
+            case SELL_MESSAGE -> new SellCommand(args, cryptoWalletService, selectionKey);
             case GET_WALLET_SUMMARY_MESSAGE -> new GetWalletSummaryCommand(args, selectionKey);
             // case GET_WALLET_OVERALL_SUMMARY_MESSAGE -> new
             case HELP_MESSAGE -> new HelpCommand();

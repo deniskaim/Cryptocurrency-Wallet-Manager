@@ -1,6 +1,7 @@
 package user;
 
 import exceptions.InsufficientFundsException;
+import exceptions.MissingInWalletAssetException;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -34,6 +35,26 @@ public class CryptoWallet implements Serializable {
         }
 
         holdings.put(assetID, holdings.getOrDefault(assetID, 0.0d) + boughtQuantity);
+    }
+
+    public double getQuantityOfAsset(String assetID) throws MissingInWalletAssetException {
+        if (assetID == null) {
+            throw new IllegalArgumentException("assetID cannot be null reference!");
+        }
+        if (!holdings.containsKey(assetID)) {
+            throw new MissingInWalletAssetException("There is no active investment in this crypto asset!");
+        }
+        return holdings.get(assetID);
+    }
+
+    public void removeAsset(String assetID) throws MissingInWalletAssetException {
+        if (assetID == null) {
+            throw new IllegalArgumentException("assetID cannot be null reference!");
+        }
+        if (!holdings.containsKey(assetID)) {
+            throw new MissingInWalletAssetException("There is no active investment in this crypto asset!");
+        }
+        holdings.remove(assetID);
     }
 
     public String getSummary() {

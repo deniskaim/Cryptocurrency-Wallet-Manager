@@ -2,6 +2,7 @@ package service.cryptowallet;
 
 import exceptions.InsufficientFundsException;
 import exceptions.InvalidAssetException;
+import exceptions.MissingInWalletAssetException;
 import exceptions.api.CryptoClientException;
 import coinapi.client.CoinApiClient;
 import coinapi.dto.Asset;
@@ -37,7 +38,7 @@ public class CryptoWalletService {
     }
 
     public double buyCrypto(double amountToSpend, String assetID, CryptoWallet cryptoWallet)
-        throws InsufficientFundsException, InvalidAssetException, CryptoClientException {
+        throws InsufficientFundsException {
         validateCryptoWallet(cryptoWallet);
         if (assetID == null) {
             throw new IllegalArgumentException("assetID cannot be null reference!");
@@ -53,13 +54,31 @@ public class CryptoWalletService {
         return quantityToBuy;
     }
 
+    public double sellCrypto(String assetID, CryptoWallet cryptoWallet)
+        throws MissingInWalletAssetException {
+        validateCryptoWallet(cryptoWallet);
+        if (assetID == null) {
+            throw new IllegalArgumentException("assetID cannot be null reference!");
+        }
+
+        Asset asset = getAssetByAssetID(assetID);
+        double cryptoPrice = asset.price();
+
+        double quantityInWallet = cryptoWallet.getQuantityOfAsset(assetID);
+        cryptoWallet.removeAsset(assetID);
+
+        double income = cryptoPrice * quantityInWallet;
+        cryptoWallet.depositMoney(income);
+        return income;
+    }
+
     private void validateCryptoWallet(CryptoWallet cryptoWallet) {
         if (cryptoWallet == null) {
             throw new IllegalArgumentException("cryptoWallet cannot be null reference!");
         }
     }
 
-    private Asset getAssetByAssetID(String assetID) throws CryptoClientException, InvalidAssetException {
+    private Asset getAssetByAssetID(String assetID) {
         try {
             return coinApiClient.getAsset(assetID);
         } catch (InvalidAssetException e) {
