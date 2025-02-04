@@ -54,7 +54,7 @@ public class CryptoWalletClient {
 
             }
         } catch (IOException e) {
-            System.out.println("The server is not working!");
+            System.out.println("Unable to connect to the server. Try again later!");
         }
     }
 

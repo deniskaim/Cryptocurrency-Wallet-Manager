@@ -13,6 +13,8 @@ import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import static utils.HashingAlgorithm.hashPassword;
+
 public class UserRepository implements AutoCloseable {
     private static final String FILE_NAME = "CryptoWalletUsersData.txt";
     private final Map<String, User> mapUsernameAccount;
@@ -25,8 +27,8 @@ public class UserRepository implements AutoCloseable {
         if (user == null) {
             throw new IllegalArgumentException("user cannot be null reference!");
         }
-        mapUsernameAccount.put(user.authenticationData().username(), user);
-        saveUsersToFile();
+        setHashedPassword(user);
+        mapUsernameAccount.put(user.authenticationData().getUsername(), user);
     }
 
     public boolean userExists(String username) {
@@ -41,64 +43,21 @@ public class UserRepository implements AutoCloseable {
             throw new IllegalArgumentException("username cannot be null reference!");
         }
 
-        String triedPassword = authenticationData.password();
-        String actualPassword = getPasswordByUsername(authenticationData.username());
-        if (!actualPassword.equals(triedPassword)) {
+        String triedPassword = authenticationData.getPassword();
+        String hashedTriedPassword = hashPassword(triedPassword);
+
+        String actualPassword = getPasswordByUsername(authenticationData.getUsername());
+        if (!actualPassword.equals(hashedTriedPassword)) {
             throw new WrongPasswordException("The password is incorrect!");
         }
 
-        return mapUsernameAccount.get(authenticationData.username());
+        return mapUsernameAccount.get(authenticationData.getUsername());
     }
 
     @Override
     public void close() {
         saveUsersToFile();
     }
-
-    /*
-    private Map<String, User> loadSavedRegisteredUsers() {
-
-        Map<String, User> usersFromFile = new HashMap<>();
-        try (ObjectInputStream reader = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
-            while (true) {
-                try {
-                    User currentUser = (User) reader.readObject();
-                    usersFromFile.put(currentUser.authenticationData().username(), currentUser);
-                } catch (EOFException e) {
-                    break;
-                }
-            }
-            return usersFromFile;
-        } catch (FileNotFoundException e) {
-            return usersFromFile;
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("A problem occurred while loading the registered users!", e);
-        }
-    }
-
-    private void saveUserToFile(User newUser) {
-        try {
-            File file = new File(FILE_NAME);
-            if (!file.exists()) {
-                try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
-                    objectOutputStream.writeObject(newUser);
-                }
-            } else {
-                try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(
-                    new FileOutputStream(FILE_NAME, true)) {
-                    @Override
-                    protected void writeStreamHeader() throws IOException {
-
-                    }
-                }) {
-                    objectOutputStream.writeObject(newUser);
-                }
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Could not save the new user with the already registered users!", e);
-        }
-    }
-*/
 
     private Map<String, User> loadSavedRegisteredUsers() {
         Map<String, User> usersFromFile = new HashMap<>();
@@ -124,6 +83,11 @@ public class UserRepository implements AutoCloseable {
     }
 
     private String getPasswordByUsername(String username) {
-        return mapUsernameAccount.get(username).authenticationData().password();
+        return mapUsernameAccount.get(username).authenticationData().getPassword();
+    }
+
+    private void setHashedPassword(User user) {
+        String hashedPassword = hashPassword(user.authenticationData().getPassword());
+        user.authenticationData().setPassword(hashedPassword);
     }
 }

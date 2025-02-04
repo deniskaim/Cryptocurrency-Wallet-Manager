@@ -3,12 +3,14 @@ package service.cryptowallet;
 import exceptions.InsufficientFundsException;
 import exceptions.InvalidAssetException;
 import exceptions.MissingInWalletAssetException;
+import exceptions.NoActiveInvestmentsException;
 import exceptions.api.CryptoClientException;
 import coinapi.client.CoinApiClient;
 import coinapi.dto.Asset;
 import user.CryptoWallet;
 
 import java.util.List;
+import java.util.Map;
 
 public class CryptoWalletService {
 
@@ -51,6 +53,8 @@ public class CryptoWalletService {
 
         cryptoWallet.withdrawMoney(amountToSpend);
         cryptoWallet.addQuantityToWallet(assetID, quantityToBuy);
+        cryptoWallet.setPurchasePriceOfAsset(assetID, cryptoPrice);
+
         return quantityToBuy;
     }
 
@@ -70,6 +74,23 @@ public class CryptoWalletService {
         double income = cryptoPrice * quantityInWallet;
         cryptoWallet.depositMoney(income);
         return income;
+    }
+
+    public double accumulateProfitLoss(CryptoWallet cryptoWallet) throws NoActiveInvestmentsException {
+        validateCryptoWallet(cryptoWallet);
+        double investedValue = cryptoWallet.getInvestedMoney();
+
+        Map<String, Double> accountHoldings = cryptoWallet.getHoldings();
+        if (accountHoldings.isEmpty()) {
+            throw new NoActiveInvestmentsException("There are no active investments in the wallet!");
+        }
+        double estimatedSellValue = 0;
+        for (String assetID : accountHoldings.keySet()) {
+            double currentAssetQuantity = accountHoldings.get(assetID);
+            estimatedSellValue += getAssetByAssetID(assetID).price() * currentAssetQuantity;
+        }
+
+        return estimatedSellValue - investedValue;
     }
 
     private void validateCryptoWallet(CryptoWallet cryptoWallet) {

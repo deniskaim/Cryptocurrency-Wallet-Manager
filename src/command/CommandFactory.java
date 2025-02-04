@@ -4,6 +4,7 @@ import command.hierarchy.BuyCommand;
 import command.hierarchy.Command;
 import command.hierarchy.DepositMoneyCommand;
 import command.hierarchy.DisconnectCommand;
+import command.hierarchy.GetWalletOverallSummaryCommand;
 import command.hierarchy.GetWalletSummaryCommand;
 import command.hierarchy.HelpCommand;
 import command.hierarchy.ListOfferingsCommand;
@@ -65,7 +66,6 @@ public class CommandFactory {
             throw new IllegalArgumentException("selectionKey cannot be null!");
         }
         String[] stringsInCommandMessage = getSubstringsFromString(commandMessage);
-
         String commandSymbol = stringsInCommandMessage[0];
         validateCommandSymbol(commandSymbol);
 
@@ -82,7 +82,8 @@ public class CommandFactory {
             case BUY_MESSAGE -> new BuyCommand(args, cryptoWalletService, selectionKey);
             case SELL_MESSAGE -> new SellCommand(args, cryptoWalletService, selectionKey);
             case GET_WALLET_SUMMARY_MESSAGE -> new GetWalletSummaryCommand(args, selectionKey);
-            // case GET_WALLET_OVERALL_SUMMARY_MESSAGE -> new
+            case GET_WALLET_OVERALL_SUMMARY_MESSAGE ->
+                new GetWalletOverallSummaryCommand(args, cryptoWalletService, selectionKey);
             case HELP_MESSAGE -> new HelpCommand();
             default -> throw new IllegalArgumentException("That is an invalid command. Try again!");
         };

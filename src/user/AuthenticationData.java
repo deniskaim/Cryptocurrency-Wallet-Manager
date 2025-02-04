@@ -3,19 +3,29 @@ package user;
 import java.io.Serial;
 import java.io.Serializable;
 
-public record AuthenticationData(String username, String password) implements Serializable {
+public class AuthenticationData implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1234567891234567L;
 
-    public static AuthenticationData of(String username, String password) {
-        if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("username cannot be null reference or blank");
-        }
-        if (password == null || password.isBlank()) {
-            throw new IllegalArgumentException("password cannot be null reference or blank");
-        }
+    private final String username;
+    private String password;
 
-        return new AuthenticationData(username, password);
+    public AuthenticationData(String username, String password) {
+        this.username = username;
+        this.password = password;
     }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
 }

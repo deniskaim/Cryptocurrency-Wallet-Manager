@@ -16,14 +16,25 @@ public class CryptoWallet implements Serializable {
 
     private double balance = 0;
 
-    // cryptoCode -> amount of crypto
+    // cryptoAsset -> amount of crypto
     private final Map<String, Double> holdings = new HashMap<>();
+    private final Map<String, Double> cryptoPurchasePrices = new HashMap<>();
 
     public void depositMoney(double amountToAdd) {
         if (Double.compare(amountToAdd, 0d) <= 0) {
             throw new IllegalArgumentException("Depositing an amount below 0.00 USD is not possible!");
         }
         balance += amountToAdd;
+    }
+
+    public void setPurchasePriceOfAsset(String assetID, double purchasePrice) {
+        if (assetID == null) {
+            throw new IllegalArgumentException("assetID cannot be null reference!");
+        }
+        if (Double.compare(purchasePrice, 0d) <= 0) {
+            throw new IllegalArgumentException("A negative purchase price is not possible");
+        }
+        cryptoPurchasePrices.put(assetID, purchasePrice);
     }
 
     public void addQuantityToWallet(String assetID, double boughtQuantity) {
@@ -55,6 +66,7 @@ public class CryptoWallet implements Serializable {
             throw new MissingInWalletAssetException("There is no active investment in this crypto asset!");
         }
         holdings.remove(assetID);
+        cryptoPurchasePrices.remove(assetID);
     }
 
     public String getSummary() {
@@ -74,8 +86,18 @@ public class CryptoWallet implements Serializable {
         return summary.toString();
     }
 
+    public double getInvestedMoney() {
+        return holdings.keySet().stream()
+            .mapToDouble(assetID -> holdings.get(assetID) * cryptoPurchasePrices.get(assetID))
+            .sum();
+    }
+
     public double getBalance() {
         return balance;
+    }
+
+    public Map<String, Double> getHoldings() {
+        return holdings;
     }
 
     public boolean isAbleToSpend(double amount) {

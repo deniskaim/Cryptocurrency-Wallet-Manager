@@ -28,7 +28,8 @@ public class UserAccountService {
         }
 
         CryptoWallet wallet = new CryptoWallet();
-        User newUser = User.of(AuthenticationData.of(username, password), wallet);
+        AuthenticationData authenticationData = new AuthenticationData(username, password);
+        User newUser = User.of(authenticationData, wallet);
 
         userRepository.saveUser(newUser);
     }
@@ -41,7 +42,8 @@ public class UserAccountService {
             throw new UserNotFoundException("There is no such registered user in the system!");
         }
 
-        return userRepository.getUserByAuthenticationData(AuthenticationData.of(username, password));
+        AuthenticationData authenticationData = new AuthenticationData(username, password);
+        return userRepository.getUserByAuthenticationData(authenticationData);
     }
 
     private void validateUsername(String username) {
