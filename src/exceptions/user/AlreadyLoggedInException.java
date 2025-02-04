@@ -1,4 +1,4 @@
-package exceptions;
+package exceptions.user;
 
 public class AlreadyLoggedInException extends UserException {
     public AlreadyLoggedInException(String message) {

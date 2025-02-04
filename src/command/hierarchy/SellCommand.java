@@ -1,10 +1,10 @@
 package command.hierarchy;
 
-import exceptions.InsufficientFundsException;
 import exceptions.InvalidAssetException;
-import exceptions.MissingInWalletAssetException;
-import exceptions.NotLoggedInException;
-import exceptions.api.CryptoClientException;
+import exceptions.command.IncorrectArgumentsCountException;
+import exceptions.command.UnsuccessfulCommandException;
+import exceptions.wallet.MissingInWalletAssetException;
+import exceptions.user.NotLoggedInException;
 import service.cryptowallet.CryptoWalletService;
 import user.User;
 
@@ -21,10 +21,13 @@ public class SellCommand implements Command {
     private static final String OFFERING_CODE_INPUT_MESSAGE = "--offering=";
     private static final String SUCCESSFUL_MESSAGE = "You have successfully sold your %s for %f";
 
-    public SellCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey) {
-        if (args == null || args.length != 1) {
-            throw new IllegalArgumentException(
-                "args cannot be null reference and Sell command should contain exactly one specific argument!");
+    public SellCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey)
+        throws IncorrectArgumentsCountException {
+        if (args == null) {
+            throw new IllegalArgumentException("args cannot be null reference");
+        }
+        if (args.length != 1) {
+            throw new IncorrectArgumentsCountException("Sell command should contain exactly one specific argument!");
         }
         if (cryptoWalletService == null) {
             throw new IllegalArgumentException("cryptoWalletService cannot be null reference!");
@@ -44,12 +47,16 @@ public class SellCommand implements Command {
 
     @Override
     public String execute()
-        throws NotLoggedInException, MissingInWalletAssetException {
-        User user = (User) selectionKey.attachment();
-        if (user == null) {
-            throw new NotLoggedInException("Depositing money cannot happen before logging in!");
+        throws UnsuccessfulCommandException {
+        try {
+            User user = (User) selectionKey.attachment();
+            if (user == null) {
+                throw new NotLoggedInException("Selling crypto cannot happen before logging in!");
+            }
+            double newIncome = cryptoWalletService.sellCrypto(assetID, user.cryptoWallet());
+            return String.format(SUCCESSFUL_MESSAGE, assetID, newIncome);
+        } catch (NotLoggedInException | MissingInWalletAssetException | InvalidAssetException e) {
+            throw new UnsuccessfulCommandException("Sell command is unsuccessful! " + e.getMessage(), e);
         }
-        double newIncome = cryptoWalletService.sellCrypto(assetID, user.cryptoWallet());
-        return String.format(SUCCESSFUL_MESSAGE, assetID, newIncome);
     }
 }

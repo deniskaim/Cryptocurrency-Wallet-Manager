@@ -8,7 +8,7 @@ public class AuthenticationData implements Serializable {
     @Serial
     private static final long serialVersionUID = 1234567891234567L;
 
-    private final String username;
+    private String username;
     private String password;
 
     public AuthenticationData(String username, String password) {
@@ -18,6 +18,10 @@ public class AuthenticationData implements Serializable {
 
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {

@@ -13,22 +13,31 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.min;
 
-public class CoinApiClient {
+public class CoinApiClient implements AutoCloseable {
 
     private static final String SCHEME = "https";
     private static final String HOST = "rest.coinapi.io";
     private static final String PATH_ALL_ASSETS = "/v1/assets";
-    private static final String PATH_SINGLE_ASSET = "/v1/assets/%s";
     private static final String QUERY = "apikey=%s";
 
     private static final int MAX_ASSETS_COUNT = 50;
+    private static final int UPDATE_CRYPTO_ASSETS_INTERVAL = 30;
 
     private final HttpClient cryptoHttpClient;
     private final String apiKey;
+
+    private final Map<String, Asset> allAssets = new ConcurrentHashMap<>();
+    private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 
     private static final Gson GSON = new Gson();
 
@@ -41,35 +50,59 @@ public class CoinApiClient {
         }
         this.cryptoHttpClient = cryptoHttpClient;
         this.apiKey = apiKey;
+
+        startUpdatingAssets();
     }
 
-    //todo: Server has to cache the information from the API for 30 minutes.
-
-    public List<Asset> getAllAssets() throws CryptoClientException {
-        List<Asset> assetList = getAssetByPath(PATH_ALL_ASSETS);
-        List<Asset> cryptoAssets = assetList.stream()
-            .filter(asset -> asset.typeIsCrypto() == 1 && Double.compare(asset.price(), 0d) == 1)
-            .toList();
-
-        int countToReturn = min(cryptoAssets.size(), MAX_ASSETS_COUNT);
-        return cryptoAssets.subList(0, countToReturn);
+    public List<Asset> getAllAssets() {
+        return new ArrayList<>(allAssets.values());
     }
 
-    public Asset getAsset(String assetID) throws CryptoClientException, InvalidAssetException {
+    public Asset getAsset(String assetID) throws InvalidAssetException {
         if (assetID == null) {
             throw new IllegalArgumentException("assetID cannot be null reference!");
         }
-        List<Asset> assetsList = getAssetByPath(String.format(PATH_SINGLE_ASSET, assetID));
-        if (assetsList.isEmpty()) {
-            throw new InvalidAssetException("There is no such asset!");
+        if (!allAssets.containsKey(assetID)) {
+            throw new InvalidAssetException("There is no asset with this assetID!");
         }
-        return assetsList.getFirst();
+        return allAssets.get(assetID);
     }
 
-    private List<Asset> getAssetByPath(String path) throws CryptoClientException {
+    @Override
+    public void close() {
+        scheduledExecutor.shutdown();
+    }
+
+    private void startUpdatingAssets() {
+        scheduledExecutor.scheduleAtFixedRate(() -> {
+            try {
+                updateAssets();
+            } catch (InvalidApiKeyException e) {
+                throw new RuntimeException("ApiKey is invalid! Try with another one!", e);
+            } catch (CryptoClientException e) {
+                throw new RuntimeException("A problem with the CoinAPI request occurred!", e);
+            }
+        }, 0, UPDATE_CRYPTO_ASSETS_INTERVAL, TimeUnit.MINUTES);
+    }
+
+    private void updateAssets() throws CryptoClientException {
+        List<Asset> assetList = getAssetsFromAPI();
+        int countToReturn = min(assetList.size(), MAX_ASSETS_COUNT);
+
+        Map<String, Asset> updatedAssets = new ConcurrentHashMap<>();
+        assetList.stream()
+            .filter(asset -> asset.typeIsCrypto() == 1 && Double.compare(asset.price(), 0d) == 1)
+            .limit(countToReturn)
+            .forEach(asset -> updatedAssets.put(asset.assetID(), asset));
+
+        allAssets.clear();
+        allAssets.putAll(updatedAssets);
+    }
+
+    private List<Asset> getAssetsFromAPI() throws CryptoClientException {
         HttpResponse<String> responseFromAPI;
         try {
-            URI uri = new URI(SCHEME, HOST, path, String.format(QUERY, apiKey), null);
+            URI uri = new URI(SCHEME, HOST, PATH_ALL_ASSETS, String.format(QUERY, apiKey), null);
             HttpRequest httpRequest = HttpRequest.newBuilder().uri(uri).build();
             responseFromAPI = cryptoHttpClient.send(httpRequest, HttpResponse.BodyHandlers.ofString());
         } catch (Exception e) {

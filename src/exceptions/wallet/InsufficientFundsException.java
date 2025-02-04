@@ -1,6 +1,6 @@
-package exceptions;
+package exceptions.wallet;
 
-public class InsufficientFundsException extends Exception {
+public class InsufficientFundsException extends WalletException {
     public InsufficientFundsException(String message) {
         super(message);
     }

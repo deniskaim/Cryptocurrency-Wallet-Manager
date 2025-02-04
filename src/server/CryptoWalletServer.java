@@ -4,6 +4,9 @@ import coinapi.client.CoinApiClient;
 import command.CommandExecutor;
 import command.CommandFactory;
 import command.hierarchy.Command;
+import exceptions.command.IncorrectArgumentsCountException;
+import exceptions.command.InvalidCommandException;
+import exceptions.command.UnsuccessfulCommandException;
 import service.cryptowallet.CryptoWalletService;
 import service.account.UserAccountService;
 import service.account.UserRepository;
@@ -43,7 +46,7 @@ public class CryptoWalletServer {
     }
 
     public static void main(String[] args) {
-        int port = 7777;
+        final int port = 7777;
         CryptoWalletServer cryptoWalletServer = new CryptoWalletServer(port, new CommandExecutor());
         cryptoWalletServer.start();
     }
@@ -51,15 +54,15 @@ public class CryptoWalletServer {
     public void start() {
         try (ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
              UserRepository userRepository = new UserRepository();
+             CoinApiClient coinApiClient =
+                 new CoinApiClient(HttpClient.newHttpClient(), APIKEY);
              ExecutorService executor = Executors.newSingleThreadExecutor()) {
 
             selector = Selector.open();
             configureServerSocket(serverSocketChannel);
-            commandFactory = createCommandFactory(userRepository);
-
+            commandFactory = createCommandFactory(userRepository, coinApiClient);
             Runnable listenForStopCommandRunnable = new StopServerRunnable(this);
             executor.submit(listenForStopCommandRunnable);
-
             while (isRunning) {
                 try {
                     int readyChannels = selector.select();
@@ -162,17 +165,14 @@ public class CryptoWalletServer {
             if (selectionKey.channel().isOpen()) {
                 writeToClient(successfulMessage, (SocketChannel) selectionKey.channel());
             }
-        } catch (Exception e) {
+        } catch (InvalidCommandException | IncorrectArgumentsCountException | UnsuccessfulCommandException e) {
             String exceptionMessage = e.getMessage();
             writeToClient(exceptionMessage, (SocketChannel) selectionKey.channel());
         }
     }
 
-    private CommandFactory createCommandFactory(UserRepository userRepository) {
+    private CommandFactory createCommandFactory(UserRepository userRepository, CoinApiClient coinApiClient) {
         UserAccountService userAccountService = new UserAccountService(userRepository);
-
-        CoinApiClient coinApiClient =
-            new CoinApiClient(HttpClient.newHttpClient(), APIKEY);
         CryptoWalletService cryptoWalletService = new CryptoWalletService(coinApiClient);
 
         return CommandFactory.getInstance(userAccountService, cryptoWalletService);

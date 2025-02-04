@@ -1,6 +1,8 @@
 package command.hierarchy;
 
-import exceptions.NotLoggedInException;
+import exceptions.command.IncorrectArgumentsCountException;
+import exceptions.command.UnsuccessfulCommandException;
+import exceptions.user.NotLoggedInException;
 import service.cryptowallet.CryptoWalletService;
 import user.User;
 
@@ -14,9 +16,10 @@ public class DepositMoneyCommand implements Command {
 
     private static final String SUCCESSFUL_MESSAGE = "You have successfully made a deposit of %f";
 
-    public DepositMoneyCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey) {
-        if (args == null || args.length != 1) {
-            throw new IllegalArgumentException("DepositMoney should be include only one argument - the amount");
+    public DepositMoneyCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey)
+        throws IncorrectArgumentsCountException {
+        if (args == null) {
+            throw new IllegalArgumentException("args in DepositMoney command cannot be null reference!");
         }
         if (cryptoWalletService == null) {
             throw new IllegalArgumentException("cryptoWalletService cannot be null reference!");
@@ -24,7 +27,9 @@ public class DepositMoneyCommand implements Command {
         if (selectionKey == null) {
             throw new IllegalArgumentException("selectionKey cannot be null reference!");
         }
-
+        if (args.length != 1) {
+            throw new IncorrectArgumentsCountException("Deposit command should contain exactly one specific argument!");
+        }
         try {
             this.amount = Double.parseDouble(args[0]);
             if (this.amount < 0) {
@@ -38,12 +43,16 @@ public class DepositMoneyCommand implements Command {
     }
 
     @Override
-    public String execute() throws NotLoggedInException {
-        User user = (User) selectionKey.attachment();
-        if (user == null) {
-            throw new NotLoggedInException("Depositing money cannot happen before logging in!");
+    public String execute() throws UnsuccessfulCommandException {
+        try {
+            User user = (User) selectionKey.attachment();
+            if (user == null) {
+                throw new NotLoggedInException("Depositing money cannot happen before logging in!");
+            }
+            cryptoWalletService.depositMoneyInWallet(amount, user.cryptoWallet());
+            return String.format(SUCCESSFUL_MESSAGE, amount);
+        } catch (NotLoggedInException e) {
+            throw new UnsuccessfulCommandException("DepositMoney command is unsuccessful! " + e.getMessage(), e);
         }
-        cryptoWalletService.depositMoneyInWallet(amount, user.cryptoWallet());
-        return String.format(SUCCESSFUL_MESSAGE, amount);
     }
 }

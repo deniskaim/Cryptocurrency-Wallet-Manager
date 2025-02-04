@@ -1,6 +1,8 @@
 package command.hierarchy;
 
-import exceptions.UsernameAlreadyTakenException;
+import exceptions.command.IncorrectArgumentsCountException;
+import exceptions.command.UnsuccessfulCommandException;
+import exceptions.user.UsernameAlreadyTakenException;
 import service.account.UserAccountService;
 
 public class RegisterCommand implements Command {
@@ -11,9 +13,13 @@ public class RegisterCommand implements Command {
 
     private static final String SUCCESSFUL_MESSAGE = "You have successfully registered in the system";
 
-    public RegisterCommand(String[] args, UserAccountService userAccountService) {
-        if (args == null || args.length != 2) {
-            throw new IllegalArgumentException("Register command should include just username and password!");
+    public RegisterCommand(String[] args, UserAccountService userAccountService)
+        throws IncorrectArgumentsCountException {
+        if (args == null) {
+            throw new IllegalArgumentException("args cannot be null");
+        }
+        if (args.length != 2) {
+            throw new IncorrectArgumentsCountException("Register command should include just username and password!");
         }
         if (userAccountService == null) {
             throw new IllegalArgumentException("userAccountService cannot be null!");
@@ -25,8 +31,13 @@ public class RegisterCommand implements Command {
     }
 
     @Override
-    public String execute() throws UsernameAlreadyTakenException {
-        userAccountService.registerUser(username, password);
-        return SUCCESSFUL_MESSAGE;
+    public String execute() throws UnsuccessfulCommandException {
+        try {
+            userAccountService.registerUser(username, password);
+            return SUCCESSFUL_MESSAGE;
+        } catch (UsernameAlreadyTakenException e) {
+            throw new UnsuccessfulCommandException(
+                "Register command is unsuccessful! " + e.getMessage(), e);
+        }
     }
 }

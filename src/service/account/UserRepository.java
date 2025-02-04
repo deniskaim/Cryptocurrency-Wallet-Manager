@@ -1,6 +1,6 @@
 package service.account;
 
-import exceptions.WrongPasswordException;
+import exceptions.user.WrongPasswordException;
 import user.AuthenticationData;
 import user.User;
 
@@ -20,7 +20,7 @@ public class UserRepository implements AutoCloseable {
     private final Map<String, User> mapUsernameAccount;
 
     public UserRepository() {
-        mapUsernameAccount = loadSavedRegisteredUsers();
+        this.mapUsernameAccount = loadSavedRegisteredUsers();
     }
 
     public void saveUser(User user) {

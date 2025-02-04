@@ -1,6 +1,6 @@
-package exceptions;
+package exceptions.wallet;
 
-public class NoActiveInvestmentsException extends Exception {
+public class NoActiveInvestmentsException extends WalletException {
     public NoActiveInvestmentsException(String message) {
         super(message);
     }

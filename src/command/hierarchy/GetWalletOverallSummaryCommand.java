@@ -1,7 +1,10 @@
 package command.hierarchy;
 
-import exceptions.NoActiveInvestmentsException;
-import exceptions.NotLoggedInException;
+import exceptions.InvalidAssetException;
+import exceptions.command.IncorrectArgumentsCountException;
+import exceptions.command.UnsuccessfulCommandException;
+import exceptions.wallet.NoActiveInvestmentsException;
+import exceptions.user.NotLoggedInException;
 import service.cryptowallet.CryptoWalletService;
 import user.User;
 
@@ -17,10 +20,14 @@ public class GetWalletOverallSummaryCommand implements Command {
     private static final String NEUTRAL_MESSAGE = "No profit or loss at the moment. Your investments are safe!";
 
     public GetWalletOverallSummaryCommand(String[] args, CryptoWalletService cryptoWalletService,
-                                          SelectionKey selectionKey) {
-        if (args == null || args.length != 0) {
+                                          SelectionKey selectionKey) throws IncorrectArgumentsCountException {
+        if (args == null) {
             throw new IllegalArgumentException(
-                "args cannot be null reference and Get-Wallet-Overall-Summary command should not contain arguments!");
+                "args in GetWalletOverallSummaryCommand cannot be null reference!");
+        }
+        if (args.length != 0) {
+            throw new IncorrectArgumentsCountException(
+                "GetWalletOverallSummary command should not contain arguments!");
         }
         if (cryptoWalletService == null) {
             throw new IllegalArgumentException("cryptoWalletService cannot be null reference!");
@@ -34,14 +41,22 @@ public class GetWalletOverallSummaryCommand implements Command {
     }
 
     @Override
-    public String execute() throws NotLoggedInException, NoActiveInvestmentsException {
+    public String execute()
+        throws UnsuccessfulCommandException {
         User user = (User) selectionKey.attachment();
-        if (user == null) {
-            throw new NotLoggedInException("Get-wallet-overall-summary cannot happen before logging in!");
+        try {
+            if (user == null) {
+                throw new NotLoggedInException("Get-wallet-overall-summary cannot happen before logging in!");
+            }
+            double totalProfitLoss = cryptoWalletService.accumulateProfitLoss(user.cryptoWallet());
+            return getCorrectResponse(totalProfitLoss);
+        } catch (NotLoggedInException | NoActiveInvestmentsException | InvalidAssetException e) {
+            throw new UnsuccessfulCommandException(
+                "GetWalletOverallSummary command is not successful! " + e.getMessage(), e);
         }
+    }
 
-        double totalProfitLoss = cryptoWalletService.accumulateProfitLoss(user.cryptoWallet());
-
+    private String getCorrectResponse(double totalProfitLoss) {
         if (Double.compare(totalProfitLoss, 0d) > 0) {
             return String.format(PROFIT_MESSAGE, totalProfitLoss);
         } else if (Double.compare(totalProfitLoss, 0d) < 0) {

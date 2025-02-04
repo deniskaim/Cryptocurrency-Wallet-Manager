@@ -1,7 +1,7 @@
 package user;
 
-import exceptions.InsufficientFundsException;
-import exceptions.MissingInWalletAssetException;
+import exceptions.wallet.InsufficientFundsException;
+import exceptions.wallet.MissingInWalletAssetException;
 
 import java.io.Serial;
 import java.io.Serializable;

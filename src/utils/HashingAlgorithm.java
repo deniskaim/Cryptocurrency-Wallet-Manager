@@ -12,7 +12,6 @@ public class HashingAlgorithm {
         if (password == null) {
             throw new IllegalArgumentException("password cannot be null reference!");
         }
-
         try {
             MessageDigest messageDigest = MessageDigest.getInstance(HASHING_ALGORITHM);
             byte[] hashBytes = messageDigest.digest(password.getBytes());

@@ -1,10 +1,9 @@
 package service.cryptowallet;
 
-import exceptions.InsufficientFundsException;
+import exceptions.wallet.InsufficientFundsException;
 import exceptions.InvalidAssetException;
-import exceptions.MissingInWalletAssetException;
-import exceptions.NoActiveInvestmentsException;
-import exceptions.api.CryptoClientException;
+import exceptions.wallet.MissingInWalletAssetException;
+import exceptions.wallet.NoActiveInvestmentsException;
 import coinapi.client.CoinApiClient;
 import coinapi.dto.Asset;
 import user.CryptoWallet;
@@ -29,18 +28,14 @@ public class CryptoWalletService {
     }
 
     public List<Offering> listOfferings() {
-        try {
-            List<Asset> assetList = coinApiClient.getAllAssets();
-            return assetList.stream()
-                .map(asset -> Offering.of(asset.assetID(), asset.price()))
-                .toList();
-        } catch (CryptoClientException e) {
-            throw new RuntimeException("A problem occurred while trying to list the offerings", e);
-        }
+        List<Asset> assetList = coinApiClient.getAllAssets();
+        return assetList.stream()
+            .map(asset -> Offering.of(asset.assetID(), asset.price()))
+            .toList();
     }
 
     public double buyCrypto(double amountToSpend, String assetID, CryptoWallet cryptoWallet)
-        throws InsufficientFundsException {
+        throws InsufficientFundsException, InvalidAssetException {
         validateCryptoWallet(cryptoWallet);
         if (assetID == null) {
             throw new IllegalArgumentException("assetID cannot be null reference!");
@@ -59,7 +54,7 @@ public class CryptoWalletService {
     }
 
     public double sellCrypto(String assetID, CryptoWallet cryptoWallet)
-        throws MissingInWalletAssetException {
+        throws MissingInWalletAssetException, InvalidAssetException {
         validateCryptoWallet(cryptoWallet);
         if (assetID == null) {
             throw new IllegalArgumentException("assetID cannot be null reference!");
@@ -76,14 +71,16 @@ public class CryptoWalletService {
         return income;
     }
 
-    public double accumulateProfitLoss(CryptoWallet cryptoWallet) throws NoActiveInvestmentsException {
+    public double accumulateProfitLoss(CryptoWallet cryptoWallet)
+        throws NoActiveInvestmentsException, InvalidAssetException {
         validateCryptoWallet(cryptoWallet);
-        double investedValue = cryptoWallet.getInvestedMoney();
 
         Map<String, Double> accountHoldings = cryptoWallet.getHoldings();
         if (accountHoldings.isEmpty()) {
             throw new NoActiveInvestmentsException("There are no active investments in the wallet!");
         }
+
+        double investedValue = cryptoWallet.getInvestedMoney();
         double estimatedSellValue = 0;
         for (String assetID : accountHoldings.keySet()) {
             double currentAssetQuantity = accountHoldings.get(assetID);
@@ -99,13 +96,7 @@ public class CryptoWalletService {
         }
     }
 
-    private Asset getAssetByAssetID(String assetID) {
-        try {
-            return coinApiClient.getAsset(assetID);
-        } catch (InvalidAssetException e) {
-            throw new RuntimeException("There is no asset with this offering_code!");
-        } catch (CryptoClientException e) {
-            throw new RuntimeException("A problem with the CoinAPI request occurred!");
-        }
+    private Asset getAssetByAssetID(String assetID) throws InvalidAssetException {
+        return coinApiClient.getAsset(assetID);
     }
 }

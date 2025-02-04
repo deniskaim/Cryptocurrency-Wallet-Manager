@@ -1,4 +1,4 @@
-package exceptions;
+package exceptions.user;
 
 public class UsernameAlreadyTakenException extends UserException {
     public UsernameAlreadyTakenException(String message) {

@@ -1,6 +1,8 @@
 package command.hierarchy;
 
-import exceptions.NotLoggedInException;
+import exceptions.command.IncorrectArgumentsCountException;
+import exceptions.command.UnsuccessfulCommandException;
+import exceptions.user.NotLoggedInException;
 import user.User;
 
 import java.nio.channels.SelectionKey;
@@ -9,10 +11,14 @@ public class GetWalletSummaryCommand implements Command {
 
     private final SelectionKey selectionKey;
 
-    public GetWalletSummaryCommand(String[] args, SelectionKey selectionKey) {
-        if (args == null || args.length != 0) {
+    public GetWalletSummaryCommand(String[] args, SelectionKey selectionKey) throws IncorrectArgumentsCountException {
+        if (args == null) {
             throw new IllegalArgumentException(
-                "args cannot be null reference and Get-Wallet-Summary command should not contain arguments");
+                "args in GetWalletSummary command cannot be null reference!");
+        }
+        if (args.length != 0) {
+            throw new IncorrectArgumentsCountException(
+                "GetWalletSummary command should not contain arguments!");
         }
         if (selectionKey == null) {
             throw new IllegalArgumentException("selectionKey cannot be null reference!");
@@ -22,12 +28,17 @@ public class GetWalletSummaryCommand implements Command {
     }
 
     @Override
-    public String execute() throws NotLoggedInException {
-        User user = (User) selectionKey.attachment();
-        if (user == null) {
-            throw new NotLoggedInException("Get-wallet-summary cannot happen before logging in!");
+    public String execute() throws UnsuccessfulCommandException {
+        try {
+            User user = (User) selectionKey.attachment();
+            if (user == null) {
+                throw new NotLoggedInException("Get-wallet-summary cannot happen before logging in!");
+            }
+            return user.cryptoWallet().getSummary();
+        } catch (NotLoggedInException e) {
+            throw new UnsuccessfulCommandException("GetWalletSummary command is unsuccessful! " + e.getMessage(), e);
         }
-        return user.cryptoWallet().getSummary();
+
     }
 
 }

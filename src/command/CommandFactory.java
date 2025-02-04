@@ -12,6 +12,8 @@ import command.hierarchy.LogInCommand;
 import command.hierarchy.LogOutCommand;
 import command.hierarchy.RegisterCommand;
 import command.hierarchy.SellCommand;
+import exceptions.command.IncorrectArgumentsCountException;
+import exceptions.command.InvalidCommandException;
 import service.cryptowallet.CryptoWalletService;
 import service.account.UserAccountService;
 
@@ -58,7 +60,8 @@ public class CommandFactory {
         return instance;
     }
 
-    public Command createCommand(String commandMessage, SelectionKey selectionKey) {
+    public Command createCommand(String commandMessage, SelectionKey selectionKey)
+        throws InvalidCommandException, IncorrectArgumentsCountException {
         if (commandMessage == null) {
             throw new IllegalArgumentException("input cannot be null reference");
         }
@@ -85,13 +88,13 @@ public class CommandFactory {
             case GET_WALLET_OVERALL_SUMMARY_MESSAGE ->
                 new GetWalletOverallSummaryCommand(args, cryptoWalletService, selectionKey);
             case HELP_MESSAGE -> new HelpCommand();
-            default -> throw new IllegalArgumentException("That is an invalid command. Try again!");
+            default -> throw new InvalidCommandException("That is an invalid command. Try again!");
         };
     }
 
-    private void validateCommandSymbol(String commandSymbol) {
+    private void validateCommandSymbol(String commandSymbol) throws InvalidCommandException {
         if (!commandSymbol.equals(COMMAND_SYMBOL)) {
-            throw new IllegalArgumentException("Invalid begin symbol for a command message!");
+            throw new InvalidCommandException("Invalid begin symbol for a command message!");
         }
     }
 }

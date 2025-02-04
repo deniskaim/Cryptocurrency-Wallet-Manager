@@ -1,10 +1,11 @@
 package command;
 
 import command.hierarchy.Command;
+import exceptions.command.UnsuccessfulCommandException;
 
 public class CommandExecutor {
 
-    public String executeCommand(Command command) throws Exception {
+    public String executeCommand(Command command) throws UnsuccessfulCommandException {
         if (command == null) {
             throw new IllegalArgumentException("Command cannot be null reference!");
         }

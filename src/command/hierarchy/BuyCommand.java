@@ -1,9 +1,11 @@
 package command.hierarchy;
 
-import exceptions.InsufficientFundsException;
 import exceptions.InvalidAssetException;
-import exceptions.NotLoggedInException;
-import exceptions.api.CryptoClientException;
+import exceptions.command.IncorrectArgumentsCountException;
+import exceptions.command.InvalidCommandException;
+import exceptions.command.UnsuccessfulCommandException;
+import exceptions.wallet.InsufficientFundsException;
+import exceptions.user.NotLoggedInException;
 import service.cryptowallet.CryptoWalletService;
 import user.User;
 
@@ -22,10 +24,14 @@ public class BuyCommand implements Command {
     private static final String MONEY_INPUT_MESSAGE = "--money=";
     private static final String SUCCESSFUL_MESSAGE = "You have successfully bought %f of %s";
 
-    public BuyCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey) {
-        if (args == null || args.length != 2) {
+    public BuyCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey)
+        throws IncorrectArgumentsCountException, InvalidCommandException {
+        if (args == null) {
             throw new IllegalArgumentException(
-                "args cannot be null reference and Buy command should contain exactly two specific arguments!");
+                "args in BuyCommand cannot be null reference!");
+        }
+        if (args.length != 2) {
+            throw new IncorrectArgumentsCountException("Buy command should contain exactly two specific arguments!");
         }
         if (cryptoWalletService == null) {
             throw new IllegalArgumentException("cryptoWalletService cannot be null reference!");
@@ -37,7 +43,7 @@ public class BuyCommand implements Command {
         try {
             this.assetID = getTheRestOfTheString(args[0], OFFERING_CODE_INPUT_MESSAGE);
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Offering code string is invalid!", e);
+            throw new InvalidCommandException("Offering code string is invalid!", e);
         }
 
         this.selectionKey = selectionKey;
@@ -48,20 +54,24 @@ public class BuyCommand implements Command {
                 throw new IllegalArgumentException("The amount in the buy-money command cannot be below 0.00 USD!");
             }
         } catch (NumberFormatException e) {
-            throw new RuntimeException("The amount in the buy-money command is not in an appropriate format", e);
+            throw new IllegalArgumentException("The amount in the buy-money command is not in an appropriate format",
+                e);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Money string is invalid", e);
+            throw new InvalidCommandException("Money string is invalid", e);
         }
     }
 
     @Override
-    public String execute()
-        throws NotLoggedInException, InsufficientFundsException {
-        User user = (User) selectionKey.attachment();
-        if (user == null) {
-            throw new NotLoggedInException("Depositing money cannot happen before logging in!");
+    public String execute() throws UnsuccessfulCommandException {
+        try {
+            User user = (User) selectionKey.attachment();
+            if (user == null) {
+                throw new NotLoggedInException("Depositing money cannot happen before logging in!");
+            }
+            double boughtQuantity = cryptoWalletService.buyCrypto(amount, assetID, user.cryptoWallet());
+            return String.format(SUCCESSFUL_MESSAGE, boughtQuantity, assetID);
+        } catch (NotLoggedInException | InsufficientFundsException | InvalidAssetException e) {
+            throw new UnsuccessfulCommandException("Buy command is unsuccessful! " + e.getMessage(), e);
         }
-        double boughtQuantity = cryptoWalletService.buyCrypto(amount, assetID, user.cryptoWallet());
-        return String.format(SUCCESSFUL_MESSAGE, boughtQuantity, assetID);
     }
 }
