@@ -15,7 +15,7 @@ public class CryptoWalletClient {
     private static final int BUFFER_SIZE = 2048;
     private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
     private static final String WELCOME_MESSAGE =
-        "Welcome to the Cryptocurrency Wallet Manager. Use the command \"help\" to see the functionalities!";
+        "Welcome to the Cryptocurrency Wallet Manager. Use the command \"$ help\" to see the functionalities!";
 
     public CryptoWalletClient(int port) {
         this.serverPort = port;
@@ -54,7 +54,7 @@ public class CryptoWalletClient {
 
             }
         } catch (IOException e) {
-            System.out.println("The server has stopped working!");
+            System.out.println("The server is not working!");
         }
     }
 

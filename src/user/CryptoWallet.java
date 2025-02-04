@@ -38,7 +38,8 @@ public class CryptoWallet implements Serializable {
 
     public String getSummary() {
         StringBuilder summary = new StringBuilder(SUMMARY_MESSAGE);
-        summary.append("Current balance = ").append(balance).append(System.lineSeparator());
+        summary.append("Current balance = ").append(balance).append(" USD")
+            .append(System.lineSeparator());
         if (holdings.isEmpty()) {
             summary.append("There are no crypto holdings.");
             return summary.toString();

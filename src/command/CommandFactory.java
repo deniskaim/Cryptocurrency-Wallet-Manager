@@ -4,7 +4,8 @@ import command.hierarchy.BuyCommand;
 import command.hierarchy.Command;
 import command.hierarchy.DepositMoneyCommand;
 import command.hierarchy.DisconnectCommand;
-import command.hierarchy.GetWalletSummary;
+import command.hierarchy.GetWalletSummaryCommand;
+import command.hierarchy.HelpCommand;
 import command.hierarchy.ListOfferingsCommand;
 import command.hierarchy.LogInCommand;
 import command.hierarchy.LogOutCommand;
@@ -30,6 +31,7 @@ public class CommandFactory {
     private static final String SELL_MESSAGE = "sell";
     private static final String GET_WALLET_SUMMARY_MESSAGE = "get-wallet-summary";
     private static final String GET_WALLET_OVERALL_SUMMARY_MESSAGE = "get-wallet-overall-summary";
+    private static final String HELP_MESSAGE = "help";
 
     private static CommandFactory instance;
     private final UserAccountService userAccountService;
@@ -78,8 +80,9 @@ public class CommandFactory {
             case LIST_OFFERINGS_MESSAGE -> new ListOfferingsCommand(args, cryptoWalletService, selectionKey);
             case BUY_MESSAGE -> new BuyCommand(args, cryptoWalletService, selectionKey);
             // case SELL_MESSAGE -> new
-            case GET_WALLET_SUMMARY_MESSAGE -> new GetWalletSummary(args, selectionKey);
+            case GET_WALLET_SUMMARY_MESSAGE -> new GetWalletSummaryCommand(args, selectionKey);
             // case GET_WALLET_OVERALL_SUMMARY_MESSAGE -> new
+            case HELP_MESSAGE -> new HelpCommand();
             default -> throw new IllegalArgumentException("That is an invalid command. Try again!");
         };
     }

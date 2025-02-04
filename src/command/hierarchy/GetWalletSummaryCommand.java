@@ -5,11 +5,11 @@ import user.User;
 
 import java.nio.channels.SelectionKey;
 
-public class GetWalletSummary implements Command {
+public class GetWalletSummaryCommand implements Command {
 
     private final SelectionKey selectionKey;
 
-    public GetWalletSummary(String[] args, SelectionKey selectionKey) {
+    public GetWalletSummaryCommand(String[] args, SelectionKey selectionKey) {
         if (args == null || args.length != 0) {
             throw new IllegalArgumentException(
                 "args cannot be null reference and Get-Wallet-Summary command should not contain arguments");
