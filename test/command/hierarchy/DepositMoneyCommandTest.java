@@ -44,54 +44,54 @@ public class DepositMoneyCommandTest {
     void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
         assertThrows(IllegalArgumentException.class,
             () -> new DepositMoneyCommand(null, cryptoWalletService, selectionKey),
-            "args in DepositMoneyCommand cannot be null reference!");
+            "An IllegalArgumentException is expected when args in DepositMoneyCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenCryptoWalletServiceIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new DepositMoneyCommand(args, null, selectionKey),
-            "cryptoWalletService in DepositMoneyCommand cannot be null reference!");
+            "An IllegalArgumentException is expected when cryptoWalletService in DepositMoneyCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenSelectionKeyIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new DepositMoneyCommand(args, cryptoWalletService, null),
-            "selectionKey in DepositMoneyCommand cannot be null reference!");
+            "An IllegalArgumentException is expected when selectionKey in DepositMoneyCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIncorrectArgumentsCountException() {
         assertThrows(IncorrectArgumentsCountException.class,
             () -> new DepositMoneyCommand(new String[] {"10", "randomExtraString"}, cryptoWalletService, selectionKey),
-            "DepositMoneyCommand should contain exactly one specific argument!");
+            "An IncorrectArgumentsCountException is expected when args consists of two strings");
     }
 
     @Test
     void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsNotANumber() {
         assertThrows(InvalidCommandException.class,
             () -> new DepositMoneyCommand(new String[] {"abc"}, cryptoWalletService, selectionKey),
-            "The amount in the DepositMoneyCommand is not in an appropriate format!");
+            "An InvalidCommandException is expected when the amount is not in an appropriate format!");
     }
 
     @Test
     void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsZero() {
         assertThrows(InvalidCommandException.class,
             () -> new DepositMoneyCommand(new String[] {"0"}, cryptoWalletService, selectionKey),
-            "The amount in the DepositMoneyCommand cannot be equal to 0!");
+            "An InvalidCommandException is expected when the amount is equal to 0!");
     }
 
     @Test
     void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsNegative() {
         assertThrows(InvalidCommandException.class,
             () -> new DepositMoneyCommand(new String[] {"-10"}, cryptoWalletService, selectionKey),
-            "The amount in the DepositMoneyCommand cannot be below 0!");
+            "An InvalidCommandException is expected when the amount is below 0!");
     }
 
     @Test
     void testExecuteWhenUserIsNotLoggedIn() {
         when(selectionKey.attachment()).thenReturn(null);
         assertThrows(UnsuccessfulCommandException.class, () -> depositMoneyCommand.execute(),
-            "Depositing cannot happen before logging in!");
+            "An UnsuccessfulCommandException is expected when the user is not logged in!");
     }
 
     @Test

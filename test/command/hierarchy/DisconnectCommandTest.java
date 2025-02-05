@@ -38,29 +38,29 @@ public class DisconnectCommandTest {
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new DisconnectCommand(null, selectionKey),
-            "args in DisconnectCommand cannot be null!");
+            "An IllegalArgumentException is expected when args in DisconnectCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenSelectionKeyIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new DisconnectCommand(args, null),
-            "selectionKey in DisconnectCommand cannot be null!");
+            "An IllegalArgumentException is expected when selectionKey in DisconnectCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIncorrectArgumentsCountException() {
         assertThrows(IncorrectArgumentsCountException.class,
             () -> new DisconnectCommand(new String[] {"invalidParam"}, selectionKey),
-            "DisconnectCommand should not contain arguments!");
+            "An IncorrectArgumentsCountException is expected when DisconnectCommand contains an argument!");
     }
 
     @Test
     void testExecuteShouldThrowUnsuccessfulCommandExceptionWhenIOException()
-        throws IOException, UnsuccessfulCommandException {
+        throws IOException {
         doThrow(IOException.class).when(socketChannel).close();
 
         assertThrows(UnsuccessfulCommandException.class, () -> disconnectCommand.execute(),
-            "DisconnectCommand should throw an UnsuccessfulCommandException when an IOException occurs");
+            "An UnsuccessfulCommandException is expected when an IOException occurs");
     }
 
     @Test

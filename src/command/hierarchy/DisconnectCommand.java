@@ -21,7 +21,7 @@ public class DisconnectCommand implements Command {
                 "Disconnect command should not contain arguments!");
         }
         if (selectionKey == null) {
-            throw new IllegalArgumentException("selectionKey cannot be null!");
+            throw new IllegalArgumentException("selectionKey in Disconnect command cannot be null reference!");
         }
         this.selectionKey = selectionKey;
     }

@@ -43,26 +43,26 @@ public class BuyCommandTest {
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new BuyCommand(null, cryptoWalletService, selectionKey),
-            "args in BuyCommand cannot be null reference!");
+            "An IllegalArgumentException is expected when args in BuyCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenCryptoWalletServiceIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new BuyCommand(args, null, selectionKey),
-            "cryptoWalletService in BuyCommand cannot be null reference!");
+            "An IllegalArgumentException is expected when cryptoWalletService in BuyCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenSelectionKeyIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new BuyCommand(args, cryptoWalletService, null),
-            "selectionKey in BuyCommand cannot be null reference!");
+            "An IllegalArgumentException is expected when selectionKey in BuyCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIncorrectArgumentsCountException() {
         assertThrows(IncorrectArgumentsCountException.class,
             () -> new BuyCommand(new String[] {"onlyOneString"}, cryptoWalletService, selectionKey),
-            "Buy command should contain exactly two specific arguments!");
+            "An IncorrectArgumentsCountException is expected when Buy command contains one argument!");
     }
 
     @Test
@@ -70,7 +70,7 @@ public class BuyCommandTest {
         assertThrows(
             InvalidCommandException.class,
             () -> new BuyCommand(new String[] {"--invalidParam=BTC", "--money=10"}, cryptoWalletService, selectionKey),
-            "Offering code string is invalid!");
+            "An InvalidCommandException is expected when the offering code string is invalid!");
     }
 
     @Test
@@ -79,7 +79,7 @@ public class BuyCommandTest {
             InvalidCommandException.class,
             () -> new BuyCommand(new String[] {"--offering=BTC", "--invalidParam=10"}, cryptoWalletService,
                 selectionKey),
-            "Money string is invalid!");
+            "An InvalidCommandException is expected when the money string is invalid!");
     }
 
     @Test
@@ -87,28 +87,28 @@ public class BuyCommandTest {
         assertThrows(
             InvalidCommandException.class,
             () -> new BuyCommand(new String[] {"--offering=BTC", "--money=abc"}, cryptoWalletService, selectionKey),
-            "The amount in the BuyCommand is not in an appropriate format!");
+            "An InvalidCommandException is expected when the amount in the BuyCommand is not in an appropriate format!");
     }
 
     @Test
     void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsZero() {
         assertThrows(InvalidCommandException.class,
             () -> new BuyCommand(new String[] {"--offering=BTC", "--money=0"}, cryptoWalletService, selectionKey),
-            "The amount in the BuyCommand cannot be equal to 0!");
+            "An InvalidCommandException is expected when the amount in the BuyCommand is equal to 0!");
     }
 
     @Test
     void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsNegative() {
         assertThrows(InvalidCommandException.class,
             () -> new BuyCommand(new String[] {"--offering=BTC", "--money=-10"}, cryptoWalletService, selectionKey),
-            "The amount in the BuyCommand cannot be below 0!");
+            "An InvalidCommandException is expected when the amount in the BuyCommand is below 0!");
     }
 
     @Test
     void testExecuteWhenUserIsNotLoggedIn() {
         when(selectionKey.attachment()).thenReturn(null);
         assertThrows(UnsuccessfulCommandException.class, () -> buyCommand.execute(),
-            "Buying cannot happen before logging in!");
+            "An UnsuccessfulCommandException is expected when the user is not logged in!");
     }
 
     @Test
@@ -117,7 +117,8 @@ public class BuyCommandTest {
         when(user.cryptoWallet()).thenReturn(cryptoWallet);
         when(cryptoWalletService.buyCrypto(10, "BTC", cryptoWallet)).thenThrow(InsufficientFundsException.class);
 
-        assertThrows(UnsuccessfulCommandException.class, () -> buyCommand.execute(), "Insufficient funds!");
+        assertThrows(UnsuccessfulCommandException.class, () -> buyCommand.execute(),
+            "An UnsuccessfulCommandException is expected when the funds are insufficient!");
     }
 
     @Test
@@ -126,7 +127,8 @@ public class BuyCommandTest {
         when(user.cryptoWallet()).thenReturn(cryptoWallet);
         when(cryptoWalletService.buyCrypto(10, "BTC", cryptoWallet)).thenThrow(InvalidAssetException.class);
 
-        assertThrows(UnsuccessfulCommandException.class, () -> buyCommand.execute(), "Invalid asset!");
+        assertThrows(UnsuccessfulCommandException.class, () -> buyCommand.execute(),
+            "An UnsuccessfulCommandException is expected when the asset is invalid!");
     }
 
     @Test
@@ -136,7 +138,8 @@ public class BuyCommandTest {
         when(cryptoWalletService.buyCrypto(10, "BTC", cryptoWallet)).thenReturn(0.002);
 
         String result = buyCommand.execute();
-        assertDoesNotThrow(() -> buyCommand.execute());
+        assertDoesNotThrow(() -> buyCommand.execute(),
+            "execute() should not throw an Exception when all parameters are valid!");
         assertEquals("You have successfully bought 0.002000 of BTC", result);
     }
 }
