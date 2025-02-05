@@ -14,6 +14,7 @@ import java.nio.channels.SelectionKey;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -97,6 +98,7 @@ public class DepositMoneyCommandTest {
     void testExecute() throws UnsuccessfulCommandException {
         when(selectionKey.attachment()).thenReturn(user);
         when(user.cryptoWallet()).thenReturn(cryptoWallet);
+        doNothing().when(cryptoWalletService).depositMoneyInWallet(10, cryptoWallet);
 
         assertDoesNotThrow(() -> depositMoneyCommand.execute(),
             "depositMoneyCommand should not throw an exception when all params are valid");
