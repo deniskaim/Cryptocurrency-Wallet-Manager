@@ -100,6 +100,10 @@ public class CryptoWallet implements Serializable {
         return holdings;
     }
 
+    public Map<String, Double> getCryptoPurchasePrices() {
+        return cryptoPurchasePrices;
+    }
+
     public boolean isAbleToSpend(double amount) {
         return Double.compare(balance, amount) >= 0;
     }
