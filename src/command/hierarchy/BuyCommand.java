@@ -50,7 +50,7 @@ public class BuyCommand implements Command {
         this.cryptoWalletService = cryptoWalletService;
         try {
             this.amount = Double.parseDouble(getTheRestOfTheString(args[1], MONEY_INPUT_MESSAGE));
-            if (this.amount < 0) {
+            if (Double.compare(this.amount, 0d) <= 0) {
                 throw new IllegalArgumentException("The amount in the buy-money command cannot be below 0.00 USD!");
             }
         } catch (NumberFormatException e) {

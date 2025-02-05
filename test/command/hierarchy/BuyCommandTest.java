@@ -87,14 +87,21 @@ public class BuyCommandTest {
         assertThrows(
             InvalidCommandException.class,
             () -> new BuyCommand(new String[] {"--offering=BTC", "--money=abc"}, cryptoWalletService, selectionKey),
-            "The amount in the buy-money command is not in an appropriate format!");
+            "The amount in the BuyCommand is not in an appropriate format!");
+    }
+
+    @Test
+    void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsZero() {
+        assertThrows(InvalidCommandException.class,
+            () -> new BuyCommand(new String[] {"--offering=BTC", "--money=0"}, cryptoWalletService, selectionKey),
+            "The amount in the BuyCommand cannot be equal to 0!");
     }
 
     @Test
     void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsNegative() {
         assertThrows(InvalidCommandException.class,
             () -> new BuyCommand(new String[] {"--offering=BTC", "--money=-10"}, cryptoWalletService, selectionKey),
-            "The amount in the buy-money command cannot be below 0!");
+            "The amount in the BuyCommand cannot be below 0!");
     }
 
     @Test

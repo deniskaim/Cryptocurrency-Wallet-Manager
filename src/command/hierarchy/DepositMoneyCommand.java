@@ -1,6 +1,7 @@
 package command.hierarchy;
 
 import exceptions.command.IncorrectArgumentsCountException;
+import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.NotLoggedInException;
 import service.cryptowallet.CryptoWalletService;
@@ -17,7 +18,7 @@ public class DepositMoneyCommand implements Command {
     private static final String SUCCESSFUL_MESSAGE = "You have successfully made a deposit of %f";
 
     public DepositMoneyCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey)
-        throws IncorrectArgumentsCountException {
+        throws IncorrectArgumentsCountException, InvalidCommandException {
         if (args == null) {
             throw new IllegalArgumentException("args in DepositMoney command cannot be null reference!");
         }
@@ -32,13 +33,14 @@ public class DepositMoneyCommand implements Command {
         }
         try {
             this.amount = Double.parseDouble(args[0]);
-            if (this.amount < 0) {
+            if (Double.compare(this.amount, 0d) <= 0) {
                 throw new IllegalArgumentException("The amount in the deposit-money command cannot be below 0.00 USD");
             }
             this.selectionKey = selectionKey;
             this.cryptoWalletService = cryptoWalletService;
-        } catch (NumberFormatException e) {
-            throw new RuntimeException("The amount in the deposit-money command is not in an appropriate format", e);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidCommandException("The amount in the deposit-money command is not in an appropriate format",
+                e);
         }
     }
 
