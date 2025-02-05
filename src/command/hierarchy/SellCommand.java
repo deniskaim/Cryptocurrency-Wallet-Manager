@@ -2,6 +2,7 @@ package command.hierarchy;
 
 import exceptions.InvalidAssetException;
 import exceptions.command.IncorrectArgumentsCountException;
+import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.wallet.MissingInWalletAssetException;
 import exceptions.user.NotLoggedInException;
@@ -19,10 +20,10 @@ public class SellCommand implements Command {
     private final SelectionKey selectionKey;
 
     private static final String OFFERING_CODE_INPUT_MESSAGE = "--offering=";
-    private static final String SUCCESSFUL_MESSAGE = "You have successfully sold your %s for %f";
+    private static final String SUCCESSFUL_MESSAGE = "You have successfully sold your %s for %f USD";
 
     public SellCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey)
-        throws IncorrectArgumentsCountException {
+        throws IncorrectArgumentsCountException, InvalidCommandException {
         if (args == null) {
             throw new IllegalArgumentException("args cannot be null reference");
         }
@@ -39,7 +40,7 @@ public class SellCommand implements Command {
         try {
             this.assetID = getTheRestOfTheString(args[0], OFFERING_CODE_INPUT_MESSAGE);
         } catch (IllegalArgumentException e) {
-            throw new RuntimeException("Offering code string is invalid!", e);
+            throw new InvalidCommandException("Offering code string is invalid!", e);
         }
         this.selectionKey = selectionKey;
         this.cryptoWalletService = cryptoWalletService;

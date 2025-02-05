@@ -42,12 +42,6 @@ public class CommandFactory {
     private final CryptoWalletService cryptoWalletService;
 
     private CommandFactory(UserAccountService userAccountService, CryptoWalletService cryptoWalletService) {
-        if (userAccountService == null) {
-            throw new IllegalArgumentException("userAccountService cannot be null reference!");
-        }
-        if (cryptoWalletService == null) {
-            throw new IllegalArgumentException("cryptoWalletService cannot be null reference!");
-        }
         this.userAccountService = userAccountService;
         this.cryptoWalletService = cryptoWalletService;
     }
@@ -63,7 +57,7 @@ public class CommandFactory {
     public Command createCommand(String commandMessage, SelectionKey selectionKey)
         throws InvalidCommandException, IncorrectArgumentsCountException {
         if (commandMessage == null) {
-            throw new IllegalArgumentException("input cannot be null reference");
+            throw new IllegalArgumentException("commandMessage cannot be null reference");
         }
         if (selectionKey == null) {
             throw new IllegalArgumentException("selectionKey cannot be null!");
