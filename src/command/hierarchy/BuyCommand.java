@@ -54,7 +54,7 @@ public class BuyCommand implements Command {
                 throw new IllegalArgumentException("The amount in the buy-money command cannot be below 0.00 USD!");
             }
         } catch (NumberFormatException e) {
-            throw new IllegalArgumentException("The amount in the buy-money command is not in an appropriate format",
+            throw new InvalidCommandException("The amount in the buy-money command is not in an appropriate format",
                 e);
         } catch (IllegalArgumentException e) {
             throw new InvalidCommandException("Money string is invalid", e);
@@ -66,7 +66,7 @@ public class BuyCommand implements Command {
         try {
             User user = (User) selectionKey.attachment();
             if (user == null) {
-                throw new NotLoggedInException("Depositing money cannot happen before logging in!");
+                throw new NotLoggedInException("Buying cannot happen before logging in!");
             }
             double boughtQuantity = cryptoWalletService.buyCrypto(amount, assetID, user.cryptoWallet());
             return String.format(SUCCESSFUL_MESSAGE, boughtQuantity, assetID);
