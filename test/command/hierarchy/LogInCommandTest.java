@@ -27,7 +27,6 @@ public class LogInCommandTest {
     private UserAccountService userAccountService;
     private SelectionKey selectionKey;
     private User user;
-    private CryptoWallet cryptoWallet;
 
     private LogInCommand command;
 
@@ -37,7 +36,6 @@ public class LogInCommandTest {
         userAccountService = Mockito.mock(UserAccountService.class);
         selectionKey = Mockito.mock(SelectionKey.class);
         user = Mockito.mock(User.class);
-        cryptoWallet = Mockito.mock(CryptoWallet.class);
 
         command = new LogInCommand(args, userAccountService, selectionKey);
     }
@@ -49,7 +47,7 @@ public class LogInCommandTest {
     }
 
     @Test
-    void testConstructorShouldThrowIllegalArgumentExceptionWhenCryptoWalletServiceIsNull() {
+    void testConstructorShouldThrowIllegalArgumentExceptionWhenUserAccountServiceIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new LogInCommand(args, null, selectionKey),
             "An IllegalArgumentException is expected when userAccountService in LogInCommand is null reference!");
     }

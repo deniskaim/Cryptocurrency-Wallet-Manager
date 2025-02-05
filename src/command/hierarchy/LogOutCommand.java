@@ -10,7 +10,7 @@ import java.nio.channels.SelectionKey;
 public class LogOutCommand implements Command {
 
     private final SelectionKey selectionKey;
-    private static final String SUCCESSFUL_MESSAGE = "You have successfully logged out";
+    private static final String SUCCESSFUL_MESSAGE = "You have successfully logged out!";
 
     public LogOutCommand(String[] args, SelectionKey selectionKey) throws IncorrectArgumentsCountException {
         if (args == null) {
