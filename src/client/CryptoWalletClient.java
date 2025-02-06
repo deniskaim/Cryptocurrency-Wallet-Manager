@@ -22,7 +22,7 @@ public class CryptoWalletClient {
     }
 
     public static void main(String[] args) {
-        int port = 7777;
+        final int port = 8888;
         CryptoWalletClient client = new CryptoWalletClient(port);
         client.start();
     }

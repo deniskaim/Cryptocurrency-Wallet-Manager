@@ -37,18 +37,15 @@ public class CryptoWalletService {
     public double buyCrypto(double amountToSpend, String assetID, CryptoWallet cryptoWallet)
         throws InsufficientFundsException, InvalidAssetException {
         validateCryptoWallet(cryptoWallet);
-        if (assetID == null) {
-            throw new IllegalArgumentException("assetID cannot be null reference!");
-        }
+        validateAssetID(assetID);
 
         Asset asset = getAssetByAssetID(assetID);
 
-        double cryptoPrice = asset.price();
-        double quantityToBuy = amountToSpend / cryptoPrice;
+        double assetPrice = asset.price();
+        double quantityToBuy = amountToSpend / assetPrice;
 
         cryptoWallet.withdrawMoney(amountToSpend);
-        cryptoWallet.addQuantityToWallet(assetID, quantityToBuy);
-        cryptoWallet.setPurchasePriceOfAsset(assetID, cryptoPrice);
+        cryptoWallet.addInvestment(assetID, quantityToBuy, assetPrice);
 
         return quantityToBuy;
     }
@@ -56,18 +53,17 @@ public class CryptoWalletService {
     public double sellCrypto(String assetID, CryptoWallet cryptoWallet)
         throws MissingInWalletAssetException, InvalidAssetException {
         validateCryptoWallet(cryptoWallet);
-        if (assetID == null) {
-            throw new IllegalArgumentException("assetID cannot be null reference!");
-        }
+        validateAssetID(assetID);
 
         Asset asset = getAssetByAssetID(assetID);
-        double cryptoPrice = asset.price();
 
+        double assetPrice = asset.price();
         double quantityInWallet = cryptoWallet.getQuantityOfAsset(assetID);
-        cryptoWallet.removeAsset(assetID);
+        double income = assetPrice * quantityInWallet;
 
-        double income = cryptoPrice * quantityInWallet;
+        cryptoWallet.removeInvestment(assetID);
         cryptoWallet.depositMoney(income);
+
         return income;
     }
 
@@ -81,10 +77,13 @@ public class CryptoWalletService {
         }
 
         double investedValue = cryptoWallet.getInvestedMoney();
+
         double estimatedSellValue = 0;
         for (String assetID : accountHoldings.keySet()) {
             double currentAssetQuantity = accountHoldings.get(assetID);
-            estimatedSellValue += getAssetByAssetID(assetID).price() * currentAssetQuantity;
+            double currentAssetPrice = getAssetByAssetID(assetID).price();
+
+            estimatedSellValue += currentAssetPrice * currentAssetQuantity;
         }
 
         return estimatedSellValue - investedValue;
@@ -93,6 +92,12 @@ public class CryptoWalletService {
     private void validateCryptoWallet(CryptoWallet cryptoWallet) {
         if (cryptoWallet == null) {
             throw new IllegalArgumentException("cryptoWallet cannot be null reference!");
+        }
+    }
+
+    private void validateAssetID(String assetID) {
+        if (assetID == null) {
+            throw new IllegalArgumentException("assetID cannot be null reference!");
         }
     }
 

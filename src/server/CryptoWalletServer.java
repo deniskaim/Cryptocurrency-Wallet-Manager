@@ -46,7 +46,7 @@ public class CryptoWalletServer {
     }
 
     public static void main(String[] args) {
-        final int port = 7777;
+        final int port = 8888;
         CryptoWalletServer cryptoWalletServer = new CryptoWalletServer(port, new CommandExecutor());
         cryptoWalletServer.start();
     }
