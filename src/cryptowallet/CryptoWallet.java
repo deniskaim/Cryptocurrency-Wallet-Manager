@@ -18,16 +18,39 @@ public class CryptoWallet implements Serializable {
     private double balance = 0;
 
     // cryptoAssetID -> quantity of this crypto in active investments
-    private final Map<String, Double> holdings = new HashMap<>();
+    private final Map<String, Double> holdings;
 
     // cryptoAssetID -> history of active investments in this crypto
-    private final Map<String, List<Investment>> investmentsHistory = new HashMap<>();
+    private final Map<String, List<Investment>> investmentsHistory;
+
+    public CryptoWallet() {
+        this.holdings = new HashMap<>();
+        this.investmentsHistory = new HashMap<>();
+    }
+
+    // for testing purposes
+    CryptoWallet(double balance, Map<String, Double> holdings, Map<String, List<Investment>> investmentsHistory) {
+        this.balance = balance;
+        this.holdings = holdings;
+        this.investmentsHistory = investmentsHistory;
+    }
 
     public void depositMoney(double amountToAdd) {
         if (Double.compare(amountToAdd, 0d) <= 0) {
             throw new IllegalArgumentException("Depositing an amount below 0.00 USD is not possible!");
         }
         balance += amountToAdd;
+    }
+
+    public void withdrawMoney(double amountToWithdraw) throws InsufficientFundsException {
+        if (Double.compare(amountToWithdraw, 0d) <= 0) {
+            throw new IllegalArgumentException("Withdrawing an amount below 0.00 USD is not possible!");
+        }
+        if (!isAbleToSpend(amountToWithdraw)) {
+            throw new InsufficientFundsException(
+                "The balance in the CryptoWallet is lower than the desired amount to spend!");
+        }
+        balance -= amountToWithdraw;
     }
 
     public void addInvestment(String assetID, double boughtQuantity, double assetPrice) {
@@ -71,12 +94,8 @@ public class CryptoWallet implements Serializable {
         return holdings;
     }
 
-    public void withdrawMoney(double amount) throws InsufficientFundsException {
-        if (!isAbleToSpend(amount)) {
-            throw new InsufficientFundsException(
-                "The balance in the CryptoWallet is lower than the desired amount to spend!");
-        }
-        balance -= amount;
+    public Map<String, List<Investment>> getInvestmentsHistory() {
+        return investmentsHistory;
     }
 
     private boolean isAbleToSpend(double amount) {
