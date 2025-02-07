@@ -34,18 +34,6 @@ public class CryptoWalletServiceTest {
         cryptoWalletService = new CryptoWalletService(coinApiClient);
     }
 
-    @Test
-    void depositMoneyInWalletNullCryptoWallet() {
-        assertThrows(IllegalArgumentException.class, () -> cryptoWalletService.depositMoneyInWallet(10, null),
-            "An IllegalArgumentException is expected when cryptoWallet is null reference!");
-    }
-
-    @Test
-    void depositMoneyInWallet() {
-        cryptoWalletService.depositMoneyInWallet(10, cryptoWallet);
-        verify(cryptoWallet, times(1)).depositMoney(10);
-    }
-
     private Asset createAsset(String assetID, double price) {
         return new Asset(
             assetID, null, 1, null, null,

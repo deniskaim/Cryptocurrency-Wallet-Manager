@@ -12,6 +12,7 @@ import command.pattern.LogInCommand;
 import command.pattern.LogOutCommand;
 import command.pattern.RegisterCommand;
 import command.pattern.SellCommand;
+import command.pattern.WithdrawMoneyCommand;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.InvalidCommandException;
 import cryptowallet.CryptoWalletService;
@@ -30,6 +31,7 @@ public class CommandFactory {
     private static final String LOG_OUT_MESSAGE = "logout";
     private static final String DISCONNECT_MESSAGE = "disconnect";
     private static final String DEPOSIT_MONEY_MESSAGE = "deposit-money";
+    private static final String WITHDRAW_MONEY_MESSAGE = "withdraw-money";
     private static final String LIST_OFFERINGS_MESSAGE = "list-offerings";
     private static final String BUY_MESSAGE = "buy";
     private static final String SELL_MESSAGE = "sell";
@@ -74,7 +76,8 @@ public class CommandFactory {
             case LOG_IN_MESSAGE -> new LogInCommand(args, userAccountService, selectionKey);
             case LOG_OUT_MESSAGE -> new LogOutCommand(args, selectionKey);
             case DISCONNECT_MESSAGE -> new DisconnectCommand(args, selectionKey);
-            case DEPOSIT_MONEY_MESSAGE -> new DepositMoneyCommand(args, cryptoWalletService, selectionKey);
+            case DEPOSIT_MONEY_MESSAGE -> new DepositMoneyCommand(args, selectionKey);
+            case WITHDRAW_MONEY_MESSAGE -> new WithdrawMoneyCommand(args, selectionKey);
             case LIST_OFFERINGS_MESSAGE -> new ListOfferingsCommand(args, cryptoWalletService, selectionKey);
             case BUY_MESSAGE -> new BuyCommand(args, cryptoWalletService, selectionKey);
             case SELL_MESSAGE -> new SellCommand(args, cryptoWalletService, selectionKey);

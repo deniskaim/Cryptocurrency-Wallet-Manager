@@ -23,11 +23,6 @@ public class CryptoWalletService {
         this.coinApiClient = coinApiClient;
     }
 
-    public void depositMoneyInWallet(double amount, CryptoWallet cryptoWallet) {
-        validateCryptoWallet(cryptoWallet);
-        cryptoWallet.depositMoney(amount);
-    }
-
     public CryptoCatalog getCryptoCatalogWithOfferings() {
         List<Asset> assets = coinApiClient.getAllAssets();
         List<Offering> offerings = assets.stream()
