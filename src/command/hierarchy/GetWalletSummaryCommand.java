@@ -1,5 +1,6 @@
 package command.hierarchy;
 
+import cryptowallet.CryptoWalletSummary;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.NotLoggedInException;
@@ -34,7 +35,8 @@ public class GetWalletSummaryCommand implements Command {
             if (user == null) {
                 throw new NotLoggedInException("Get-wallet-summary cannot happen before logging in!");
             }
-            return user.cryptoWallet().getSummary();
+            CryptoWalletSummary summary = user.cryptoWallet().getSummary();
+            return summary.toString();
         } catch (NotLoggedInException e) {
             throw new UnsuccessfulCommandException("GetWalletSummary command is unsuccessful! " + e.getMessage(), e);
         }

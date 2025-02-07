@@ -14,7 +14,6 @@ public class CryptoWallet implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1234567891234567L;
-    private static final String SUMMARY_MESSAGE = "Wallet Summary:" + System.lineSeparator();
 
     private double balance = 0;
 
@@ -60,21 +59,8 @@ public class CryptoWallet implements Serializable {
         return holdings.get(assetID);
     }
 
-    public String getSummary() {
-        StringBuilder summary = new StringBuilder(SUMMARY_MESSAGE);
-        summary.append("Current balance = ").append(balance).append(" USD")
-            .append(System.lineSeparator());
-        if (holdings.isEmpty()) {
-            summary.append("There are no crypto holdings.");
-            return summary.toString();
-        }
-
-        for (var entry : holdings.entrySet()) {
-            summary.append("CryptoCurrency: ").append(entry.getKey())
-                .append(", Current Quantity: ").append(entry.getValue())
-                .append(System.lineSeparator());
-        }
-        return summary.toString();
+    public CryptoWalletSummary getSummary() {
+        return CryptoWalletSummary.of(balance, holdings);
     }
 
     public double getInvestedMoney() {

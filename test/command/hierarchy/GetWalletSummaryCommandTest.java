@@ -1,5 +1,6 @@
 package command.hierarchy;
 
+import cryptowallet.CryptoWalletSummary;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import org.junit.jupiter.api.BeforeEach;
@@ -61,13 +62,15 @@ public class GetWalletSummaryCommandTest {
     @Test
     void testExecute() throws UnsuccessfulCommandException {
         String exampleSummary = "Wallet summary check!";
+        CryptoWalletSummary summaryMock = Mockito.mock(CryptoWalletSummary.class);
 
         when(selectionKey.attachment()).thenReturn(user);
         when(user.cryptoWallet()).thenReturn(cryptoWallet);
-        when(cryptoWallet.getSummary()).thenReturn(exampleSummary);
+        when(cryptoWallet.getSummary()).thenReturn(summaryMock);
+        when(summaryMock.toString()).thenReturn(exampleSummary);
 
         String result = command.execute();
-        assertEquals(exampleSummary, result);
+        assertEquals(exampleSummary, result, "GetWalletSummaryCommand doesn't return the correct string!");
     }
 
 }
