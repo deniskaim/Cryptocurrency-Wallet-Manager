@@ -4,7 +4,6 @@ import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.NotLoggedInException;
-import cryptowallet.CryptoWalletService;
 import exceptions.wallet.InsufficientFundsException;
 import user.User;
 
@@ -31,13 +30,14 @@ public class WithdrawMoneyCommand implements Command {
         }
         try {
             this.amount = Double.parseDouble(args[0]);
-            if (Double.compare(this.amount, 0d) <= 0) {
-                throw new IllegalArgumentException("The amount in the withdraw-money command cannot be below 0.00 USD");
-            }
             this.selectionKey = selectionKey;
         } catch (IllegalArgumentException e) {
             throw new InvalidCommandException(
                 "The amount in the withdraw-money command is not in an appropriate format", e);
+        }
+        if (Double.compare(this.amount, 0d) <= 0) {
+            throw new InvalidCommandException(
+                "The amount in the withdraw-money command cannot be below or equal to 0.00 USD");
         }
     }
 

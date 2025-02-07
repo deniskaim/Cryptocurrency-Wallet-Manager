@@ -27,6 +27,4 @@ public record CryptoWalletSummary(double balance, Map<String, Double> holdings) 
     static CryptoWalletSummary of(double balance, Map<String, Double> holdings) {
         return new CryptoWalletSummary(balance, new HashMap<>(holdings));
     }
-
-
 }

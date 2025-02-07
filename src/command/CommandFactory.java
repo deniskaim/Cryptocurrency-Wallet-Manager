@@ -70,7 +70,6 @@ public class CommandFactory {
 
         String actualCommandString = stringsInCommandMessage[1];
         String[] args = Arrays.copyOfRange(stringsInCommandMessage, 2, stringsInCommandMessage.length);
-
         return switch (actualCommandString) {
             case REGISTER_MESSAGE -> new RegisterCommand(args, userAccountService);
             case LOG_IN_MESSAGE -> new LogInCommand(args, userAccountService, selectionKey);

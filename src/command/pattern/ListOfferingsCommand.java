@@ -5,18 +5,14 @@ import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.NotLoggedInException;
 import cryptowallet.CryptoWalletService;
-import cryptowallet.offers.Offering;
 import user.User;
 
 import java.nio.channels.SelectionKey;
-import java.util.List;
 
 public class ListOfferingsCommand implements Command {
 
     private final CryptoWalletService cryptoWalletService;
     private final SelectionKey selectionKey;
-
-    private static final String SUCCESSFUL_MESSAGE = "Available Cryptocurrencies:" + System.lineSeparator();
 
     public ListOfferingsCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey)
         throws IncorrectArgumentsCountException {

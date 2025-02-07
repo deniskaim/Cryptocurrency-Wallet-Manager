@@ -4,7 +4,6 @@ import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.NotLoggedInException;
-import cryptowallet.CryptoWalletService;
 import user.User;
 
 import java.nio.channels.SelectionKey;
@@ -29,13 +28,14 @@ public class DepositMoneyCommand implements Command {
         }
         try {
             this.amount = Double.parseDouble(args[0]);
-            if (Double.compare(this.amount, 0d) <= 0) {
-                throw new IllegalArgumentException("The amount in the deposit-money command cannot be below 0.00 USD");
-            }
             this.selectionKey = selectionKey;
-        } catch (IllegalArgumentException e) {
+        } catch (NumberFormatException e) {
             throw new InvalidCommandException("The amount in the deposit-money command is not in an appropriate format",
                 e);
+        }
+        if (Double.compare(this.amount, 0d) <= 0) {
+            throw new InvalidCommandException(
+                "The amount in the deposit-money command cannot be below 0.00 or equal to USD");
         }
     }
 
