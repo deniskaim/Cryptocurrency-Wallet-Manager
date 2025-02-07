@@ -1,4 +1,4 @@
-package command.hierarchy;
+package command.pattern;
 
 import cryptowallet.CryptoWalletSummary;
 import exceptions.command.IncorrectArgumentsCountException;

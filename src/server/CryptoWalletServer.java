@@ -3,7 +3,7 @@ package server;
 import coinapi.client.CoinApiClient;
 import command.CommandExecutor;
 import command.CommandFactory;
-import command.hierarchy.Command;
+import command.pattern.Command;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;

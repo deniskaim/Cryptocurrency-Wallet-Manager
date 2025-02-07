@@ -1,4 +1,4 @@
-package command.hierarchy;
+package command.pattern;
 
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;

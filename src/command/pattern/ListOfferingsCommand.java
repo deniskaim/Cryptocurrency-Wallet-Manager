@@ -1,10 +1,11 @@
-package command.hierarchy;
+package command.pattern;
 
+import cryptowallet.offers.CryptoCatalog;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.NotLoggedInException;
 import cryptowallet.CryptoWalletService;
-import cryptowallet.Offering;
+import cryptowallet.offers.Offering;
 import user.User;
 
 import java.nio.channels.SelectionKey;
@@ -44,16 +45,8 @@ public class ListOfferingsCommand implements Command {
             if (user == null) {
                 throw new NotLoggedInException("Listing offerings cannot happen before logging in!");
             }
-            List<Offering> offerings = cryptoWalletService.listOfferings();
-            StringBuilder result = new StringBuilder(SUCCESSFUL_MESSAGE);
-            for (int i = 0; i < offerings.size(); i++) {
-                result.append(offerings.get(i).assetID()).append(" ")
-                    .append(offerings.get(i).price());
-                if (i != offerings.size() - 1) {
-                    result.append(System.lineSeparator());
-                }
-            }
-            return result.toString();
+            CryptoCatalog cryptoCatalog = cryptoWalletService.getCryptoCatalogWithOfferings();
+            return cryptoCatalog.toString();
         } catch (NotLoggedInException e) {
             throw new UnsuccessfulCommandException("ListOfferings command is unsuccessful! " + e.getMessage(), e);
         }

@@ -1,4 +1,4 @@
-package command.hierarchy;
+package command.pattern;
 
 public class HelpCommand implements Command {
 

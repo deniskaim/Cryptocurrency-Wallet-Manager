@@ -1,12 +1,13 @@
-package command.hierarchy;
+package command.pattern;
 
+import cryptowallet.offers.CryptoCatalog;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import cryptowallet.CryptoWalletService;
-import cryptowallet.Offering;
+import cryptowallet.offers.Offering;
 import user.User;
 
 import java.nio.channels.SelectionKey;
@@ -79,12 +80,14 @@ public class ListOfferingsCommandTest {
         when(offering2.assetID()).thenReturn("ETH");
         when(offering2.price()).thenReturn(10000d);
 
-        when(cryptoWalletService.listOfferings()).thenReturn(List.of(offering1, offering2));
-
-        String result = command.execute();
         String expectedResult = "Available Cryptocurrencies:" + System.lineSeparator()
             + "BTC 90000.0" + System.lineSeparator() + "ETH 10000.0";
 
+        CryptoCatalog catalogMock = Mockito.mock(CryptoCatalog.class);
+        when(catalogMock.toString()).thenReturn(expectedResult);
+        when(cryptoWalletService.getCryptoCatalogWithOfferings()).thenReturn(catalogMock);
+
+        String result = command.execute();
         assertEquals(expectedResult, result, "ListOffering does not return the correct string");
     }
 }

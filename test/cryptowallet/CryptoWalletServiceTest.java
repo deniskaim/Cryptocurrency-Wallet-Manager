@@ -2,6 +2,8 @@ package cryptowallet;
 
 import coinapi.client.CoinApiClient;
 import coinapi.dto.Asset;
+import cryptowallet.offers.CryptoCatalog;
+import cryptowallet.offers.Offering;
 import exceptions.InvalidAssetException;
 import exceptions.wallet.InsufficientFundsException;
 import exceptions.wallet.MissingInWalletAssetException;
@@ -61,8 +63,9 @@ public class CryptoWalletServiceTest {
         List<Offering> expectedOfferings =
             List.of(Offering.of("customAsset1", 10.0), Offering.of("customAsset2", 20.0));
 
-        List<Offering> resultOffering = cryptoWalletService.listOfferings();
-        assertEquals(expectedOfferings, resultOffering, "listOfferings() does not return the correct offerings!");
+        CryptoCatalog expectedCatalog = CryptoCatalog.of(expectedOfferings);
+        CryptoCatalog resultCatalog = cryptoWalletService.getCryptoCatalogWithOfferings();
+        assertEquals(expectedCatalog, resultCatalog, "listOfferings() does not return the correct catalog!");
     }
 
     @Test

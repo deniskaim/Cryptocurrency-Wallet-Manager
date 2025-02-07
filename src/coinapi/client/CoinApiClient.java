@@ -95,7 +95,6 @@ public class CoinApiClient implements AutoCloseable {
             .limit(countToReturn)
             .forEach(asset -> updatedAssets.put(asset.assetID(), asset));
 
-        allAssets.clear();
         allAssets.putAll(updatedAssets);
     }
 

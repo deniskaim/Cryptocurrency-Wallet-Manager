@@ -1,4 +1,4 @@
-package command.hierarchy;
+package command.pattern;
 
 import org.junit.jupiter.api.Test;
 

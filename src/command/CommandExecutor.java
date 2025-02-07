@@ -1,6 +1,6 @@
 package command;
 
-import command.hierarchy.Command;
+import command.pattern.Command;
 import exceptions.command.UnsuccessfulCommandException;
 
 public class CommandExecutor {

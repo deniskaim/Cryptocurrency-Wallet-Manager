@@ -1,5 +1,7 @@
 package cryptowallet;
 
+import cryptowallet.offers.CryptoCatalog;
+import cryptowallet.offers.Offering;
 import exceptions.wallet.InsufficientFundsException;
 import exceptions.InvalidAssetException;
 import exceptions.wallet.MissingInWalletAssetException;
@@ -26,11 +28,13 @@ public class CryptoWalletService {
         cryptoWallet.depositMoney(amount);
     }
 
-    public List<Offering> listOfferings() {
-        List<Asset> assetList = coinApiClient.getAllAssets();
-        return assetList.stream()
+    public CryptoCatalog getCryptoCatalogWithOfferings() {
+        List<Asset> assets = coinApiClient.getAllAssets();
+        List<Offering> offerings = assets.stream()
             .map(asset -> Offering.of(asset.assetID(), asset.price()))
             .toList();
+
+        return new CryptoCatalog(offerings);
     }
 
     public double buyCrypto(double amountToSpend, String assetID, CryptoWallet cryptoWallet)
