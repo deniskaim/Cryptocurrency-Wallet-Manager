@@ -17,7 +17,7 @@ public class CryptoWallet implements Serializable {
 
     private double balance = 0;
 
-    // cryptoAssetID -> quantity of crypto in active investments
+    // cryptoAssetID -> quantity of this crypto in active investments
     private final Map<String, Double> holdings = new HashMap<>();
 
     // cryptoAssetID -> history of active investments in this crypto
@@ -41,22 +41,15 @@ public class CryptoWallet implements Serializable {
         holdings.put(assetID, holdings.getOrDefault(assetID, 0.0d) + boughtQuantity);
     }
 
-    public void removeInvestment(String assetID) throws MissingInWalletAssetException {
+    public double removeInvestment(String assetID) throws MissingInWalletAssetException {
         validateAsset(assetID);
         if (!holdings.containsKey(assetID)) {
             throw new MissingInWalletAssetException("There is no active investment in this crypto asset!");
         }
 
-        holdings.remove(assetID);
+        double quantityInWallet = holdings.remove(assetID);
         investmentsHistory.remove(assetID);
-    }
-
-    public double getQuantityOfAsset(String assetID) throws MissingInWalletAssetException {
-        validateAsset(assetID);
-        if (!holdings.containsKey(assetID)) {
-            throw new MissingInWalletAssetException("There is no active investment in this crypto asset!");
-        }
-        return holdings.get(assetID);
+        return quantityInWallet;
     }
 
     public CryptoWalletSummary getSummary() {

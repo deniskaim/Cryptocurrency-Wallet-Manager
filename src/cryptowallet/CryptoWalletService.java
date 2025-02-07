@@ -57,10 +57,9 @@ public class CryptoWalletService {
         Asset asset = getAssetByAssetID(assetID);
 
         double assetPrice = asset.price();
-        double quantityInWallet = cryptoWallet.getQuantityOfAsset(assetID);
-        double income = assetPrice * quantityInWallet;
+        double quantityInWallet = cryptoWallet.removeInvestment(assetID);
 
-        cryptoWallet.removeInvestment(assetID);
+        double income = assetPrice * quantityInWallet;
         cryptoWallet.depositMoney(income);
 
         return income;
