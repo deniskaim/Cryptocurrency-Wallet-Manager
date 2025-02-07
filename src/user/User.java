@@ -1,5 +1,7 @@
 package user;
 
+import cryptowallet.CryptoWallet;
+
 import java.io.Serial;
 import java.io.Serializable;
 

@@ -5,7 +5,7 @@ import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.AlreadyLoggedInException;
 import exceptions.user.UserNotFoundException;
 import exceptions.user.WrongPasswordException;
-import service.account.UserAccountService;
+import user.UserAccountService;
 import user.User;
 
 import java.nio.channels.SelectionKey;

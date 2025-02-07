@@ -8,8 +8,8 @@ import exceptions.wallet.MissingInWalletAssetException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import service.cryptowallet.CryptoWalletService;
-import user.CryptoWallet;
+import cryptowallet.CryptoWalletService;
+import cryptowallet.CryptoWallet;
 import user.User;
 
 import java.nio.channels.SelectionKey;

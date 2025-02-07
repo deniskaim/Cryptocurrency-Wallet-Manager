@@ -6,8 +6,6 @@ import exceptions.command.UnsuccessfulCommandException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import service.account.UserAccountService;
-import user.CryptoWallet;
 import user.User;
 
 import java.nio.channels.SelectionKey;

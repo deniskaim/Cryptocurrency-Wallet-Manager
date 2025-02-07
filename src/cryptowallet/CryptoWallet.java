@@ -1,4 +1,4 @@
-package user;
+package cryptowallet;
 
 import exceptions.wallet.InsufficientFundsException;
 import exceptions.wallet.MissingInWalletAssetException;

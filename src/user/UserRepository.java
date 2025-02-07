@@ -1,8 +1,6 @@
-package service.account;
+package user;
 
 import exceptions.user.WrongPasswordException;
-import user.AuthenticationData;
-import user.User;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

@@ -1,4 +1,4 @@
-package service.cryptowallet;
+package cryptowallet;
 
 public record Offering(String assetID, double price) {
 

@@ -1,4 +1,4 @@
-package user;
+package cryptowallet;
 
 import java.io.Serial;
 import java.io.Serializable;

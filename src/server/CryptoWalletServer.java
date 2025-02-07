@@ -7,9 +7,9 @@ import command.hierarchy.Command;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
-import service.cryptowallet.CryptoWalletService;
-import service.account.UserAccountService;
-import service.account.UserRepository;
+import cryptowallet.CryptoWalletService;
+import user.UserAccountService;
+import user.UserRepository;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;

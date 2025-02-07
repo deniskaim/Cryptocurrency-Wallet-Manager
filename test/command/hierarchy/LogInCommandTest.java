@@ -8,7 +8,7 @@ import exceptions.user.WrongPasswordException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import service.account.UserAccountService;
+import user.UserAccountService;
 import user.User;
 
 import java.nio.channels.SelectionKey;

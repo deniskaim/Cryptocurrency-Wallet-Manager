@@ -14,8 +14,8 @@ import command.hierarchy.RegisterCommand;
 import command.hierarchy.SellCommand;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.InvalidCommandException;
-import service.cryptowallet.CryptoWalletService;
-import service.account.UserAccountService;
+import cryptowallet.CryptoWalletService;
+import user.UserAccountService;
 
 import java.nio.channels.SelectionKey;
 import java.util.Arrays;

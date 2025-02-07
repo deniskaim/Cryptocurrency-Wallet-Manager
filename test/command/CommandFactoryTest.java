@@ -17,8 +17,8 @@ import exceptions.command.InvalidCommandException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import service.account.UserAccountService;
-import service.cryptowallet.CryptoWalletService;
+import user.UserAccountService;
+import cryptowallet.CryptoWalletService;
 
 import java.nio.channels.SelectionKey;
 

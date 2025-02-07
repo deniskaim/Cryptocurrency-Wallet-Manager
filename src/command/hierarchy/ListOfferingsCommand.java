@@ -3,8 +3,8 @@ package command.hierarchy;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.NotLoggedInException;
-import service.cryptowallet.CryptoWalletService;
-import service.cryptowallet.Offering;
+import cryptowallet.CryptoWalletService;
+import cryptowallet.Offering;
 import user.User;
 
 import java.nio.channels.SelectionKey;

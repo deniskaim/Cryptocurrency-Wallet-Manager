@@ -5,7 +5,7 @@ import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.wallet.NoActiveInvestmentsException;
 import exceptions.user.NotLoggedInException;
-import service.cryptowallet.CryptoWalletService;
+import cryptowallet.CryptoWalletService;
 import user.User;
 
 import java.nio.channels.SelectionKey;

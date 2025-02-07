@@ -1,4 +1,4 @@
-package service.cryptowallet;
+package cryptowallet;
 
 import exceptions.wallet.InsufficientFundsException;
 import exceptions.InvalidAssetException;
@@ -6,7 +6,6 @@ import exceptions.wallet.MissingInWalletAssetException;
 import exceptions.wallet.NoActiveInvestmentsException;
 import coinapi.client.CoinApiClient;
 import coinapi.dto.Asset;
-import user.CryptoWallet;
 
 import java.util.List;
 import java.util.Map;

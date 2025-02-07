@@ -3,7 +3,7 @@ package command.hierarchy;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.UsernameAlreadyTakenException;
-import service.account.UserAccountService;
+import user.UserAccountService;
 
 public class RegisterCommand implements Command {
 

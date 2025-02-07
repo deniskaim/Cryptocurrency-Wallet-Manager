@@ -1,11 +1,9 @@
-package service.account;
+package user;
 
 import exceptions.user.UserNotFoundException;
 import exceptions.user.UsernameAlreadyTakenException;
 import exceptions.user.WrongPasswordException;
-import user.AuthenticationData;
-import user.CryptoWallet;
-import user.User;
+import cryptowallet.CryptoWallet;
 
 public class UserAccountService {
 
