@@ -1,7 +1,6 @@
 package command.pattern;
 
 import cryptowallet.CryptoWalletSummary;
-import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.NotLoggedInException;
 import user.User;
@@ -12,19 +11,10 @@ public class GetWalletSummaryCommand implements Command {
 
     private final SelectionKey selectionKey;
 
-    public GetWalletSummaryCommand(String[] args, SelectionKey selectionKey) throws IncorrectArgumentsCountException {
-        if (args == null) {
-            throw new IllegalArgumentException(
-                "args in GetWalletSummary command cannot be null reference!");
-        }
-        if (args.length != 0) {
-            throw new IncorrectArgumentsCountException(
-                "GetWalletSummary command should not contain arguments!");
-        }
+    public GetWalletSummaryCommand(SelectionKey selectionKey) {
         if (selectionKey == null) {
             throw new IllegalArgumentException("selectionKey cannot be null reference!");
         }
-
         this.selectionKey = selectionKey;
     }
 

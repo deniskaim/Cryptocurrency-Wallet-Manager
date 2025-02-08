@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TextUtilsTest {
 
@@ -55,8 +56,7 @@ public class TextUtilsTest {
         String input = "This is a test string";
         String start = "wrongStart";
 
-        assertThrows(IllegalArgumentException.class, () ->
-                TextUtils.getTheRestOfTheString(input, start),
-            "An IllegalArgumentException is expected when start is actually not in the beginning of input!");
+        assertTrue(TextUtils.getTheRestOfTheString(input, start) == null,
+            "Null reference is expected when start is actually not in the beginning of input!");
     }
 }

@@ -1,7 +1,6 @@
 package command.pattern;
 
 import exceptions.InvalidAssetException;
-import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.wallet.InsufficientFundsException;
@@ -21,7 +20,8 @@ import static org.mockito.Mockito.when;
 
 public class BuyCommandTest {
 
-    private String[] args;
+    private String assetID;
+    private double amount;
     private CryptoWalletService cryptoWalletService;
     private SelectionKey selectionKey;
     private User user;
@@ -30,77 +30,47 @@ public class BuyCommandTest {
     private BuyCommand buyCommand;
 
     @BeforeEach
-    void setUp() throws IncorrectArgumentsCountException, InvalidCommandException {
-        args = new String[] {"--offering=BTC", "--money=10"};
+    void setUp() {
+        assetID = "BTC";
+        amount = 10d;
+
         cryptoWalletService = Mockito.mock(CryptoWalletService.class);
         selectionKey = Mockito.mock(SelectionKey.class);
         user = Mockito.mock(User.class);
         cryptoWallet = Mockito.mock(CryptoWallet.class);
 
-        buyCommand = new BuyCommand(args, cryptoWalletService, selectionKey);
+        buyCommand = new BuyCommand(assetID, amount, cryptoWalletService, selectionKey);
     }
 
     @Test
-    void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new BuyCommand(null, cryptoWalletService, selectionKey),
-            "An IllegalArgumentException is expected when args in BuyCommand is null reference!");
+    void testConstructorShouldThrowIllegalArgumentExceptionWhenAssetIDIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> new BuyCommand(null, 10d, cryptoWalletService, selectionKey),
+            "An IllegalArgumentException is expected when assetID in BuyCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenCryptoWalletServiceIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new BuyCommand(args, null, selectionKey),
+        assertThrows(IllegalArgumentException.class, () -> new BuyCommand(assetID, amount, null, selectionKey),
             "An IllegalArgumentException is expected when cryptoWalletService in BuyCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenSelectionKeyIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new BuyCommand(args, cryptoWalletService, null),
+        assertThrows(IllegalArgumentException.class, () -> new BuyCommand(assetID, amount, cryptoWalletService, null),
             "An IllegalArgumentException is expected when selectionKey in BuyCommand is null reference!");
     }
 
     @Test
-    void testConstructorShouldThrowIncorrectArgumentsCountException() {
-        assertThrows(IncorrectArgumentsCountException.class,
-            () -> new BuyCommand(new String[] {"onlyOneString"}, cryptoWalletService, selectionKey),
-            "An IncorrectArgumentsCountException is expected when Buy command contains one argument!");
-    }
-
-    @Test
-    void testConstructorShouldThrowInvalidCommandExceptionWhenOfferingCodeIsInvalid() {
-        assertThrows(
-            InvalidCommandException.class,
-            () -> new BuyCommand(new String[] {"--invalidParam=BTC", "--money=10"}, cryptoWalletService, selectionKey),
-            "An InvalidCommandException is expected when the offering code string is invalid!");
-    }
-
-    @Test
-    void testConstructorShouldThrowInvalidCommandExceptionWhenMoneyCodeIsInvalid() {
-        assertThrows(
-            InvalidCommandException.class,
-            () -> new BuyCommand(new String[] {"--offering=BTC", "--invalidParam=10"}, cryptoWalletService,
-                selectionKey),
-            "An InvalidCommandException is expected when the money string is invalid!");
-    }
-
-    @Test
-    void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsNotANumber() {
-        assertThrows(
-            InvalidCommandException.class,
-            () -> new BuyCommand(new String[] {"--offering=BTC", "--money=abc"}, cryptoWalletService, selectionKey),
-            "An InvalidCommandException is expected when the amount in the BuyCommand is not in an appropriate format!");
-    }
-
-    @Test
     void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsZero() {
-        assertThrows(InvalidCommandException.class,
-            () -> new BuyCommand(new String[] {"--offering=BTC", "--money=0"}, cryptoWalletService, selectionKey),
+        assertThrows(IllegalArgumentException.class,
+            () -> new BuyCommand(assetID, 0, cryptoWalletService, selectionKey),
             "An InvalidCommandException is expected when the amount in the BuyCommand is equal to 0!");
     }
 
     @Test
     void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsNegative() {
-        assertThrows(InvalidCommandException.class,
-            () -> new BuyCommand(new String[] {"--offering=BTC", "--money=-10"}, cryptoWalletService, selectionKey),
+        assertThrows(IllegalArgumentException.class,
+            () -> new BuyCommand(assetID, -10, cryptoWalletService, selectionKey),
             "An InvalidCommandException is expected when the amount in the BuyCommand is below 0!");
     }
 

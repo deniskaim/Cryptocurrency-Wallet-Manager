@@ -21,7 +21,7 @@ public class TextUtils {
 
         int startIndex = input.indexOf(start);
         if (startIndex == -1) {
-            throw new IllegalArgumentException("start is not in the beginning of the input");
+            return null;
         }
 
         return input.substring(startIndex + start.length());

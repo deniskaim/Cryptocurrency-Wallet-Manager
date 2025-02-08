@@ -1,6 +1,5 @@
 package command.pattern;
 
-import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.UsernameAlreadyTakenException;
 import user.UserAccountService;
@@ -13,20 +12,19 @@ public class RegisterCommand implements Command {
 
     private static final String SUCCESSFUL_MESSAGE = "You have successfully registered in the system";
 
-    public RegisterCommand(String[] args, UserAccountService userAccountService)
-        throws IncorrectArgumentsCountException {
-        if (args == null) {
-            throw new IllegalArgumentException("args cannot be null");
+    public RegisterCommand(String username, String password, UserAccountService userAccountService) {
+        if (username == null) {
+            throw new IllegalArgumentException("username cannot be null reference!");
         }
-        if (args.length != 2) {
-            throw new IncorrectArgumentsCountException("Register command should include just username and password!");
+        if (password == null) {
+            throw new IllegalArgumentException("password cannot be null reference!");
         }
         if (userAccountService == null) {
             throw new IllegalArgumentException("userAccountService cannot be null!");
         }
 
-        this.username = args[0];
-        this.password = args[1];
+        this.username = username;
+        this.password = password;
         this.userAccountService = userAccountService;
     }
 

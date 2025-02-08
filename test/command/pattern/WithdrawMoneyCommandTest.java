@@ -1,8 +1,6 @@
 package command.pattern;
 
 import cryptowallet.CryptoWallet;
-import exceptions.command.IncorrectArgumentsCountException;
-import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.wallet.InsufficientFundsException;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 public class WithdrawMoneyCommandTest {
 
-    private String[] args;
+    private double amount;
     private SelectionKey selectionKey;
     private User user;
     private CryptoWallet cryptoWallet;
@@ -30,53 +28,32 @@ public class WithdrawMoneyCommandTest {
     private WithdrawMoneyCommand withdrawMoneyCommand;
 
     @BeforeEach
-    void setUp() throws IncorrectArgumentsCountException, InvalidCommandException {
-        args = new String[] {"10"};
+    void setUp() {
+        amount = 10;
         selectionKey = Mockito.mock(SelectionKey.class);
         user = Mockito.mock(User.class);
         cryptoWallet = Mockito.mock(CryptoWallet.class);
 
-        withdrawMoneyCommand = new WithdrawMoneyCommand(args, selectionKey);
-    }
-
-    @Test
-    void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new WithdrawMoneyCommand(null, selectionKey),
-            "An IllegalArgumentException is expected when args in WithdrawMoneyCommand is null reference!");
+        withdrawMoneyCommand = new WithdrawMoneyCommand(amount, selectionKey);
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenSelectionKeyIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new WithdrawMoneyCommand(args, null),
+        assertThrows(IllegalArgumentException.class, () -> new WithdrawMoneyCommand(amount, null),
             "An IllegalArgumentException is expected when selectionKey in WithdrawMoneyCommand is null reference!");
     }
 
     @Test
-    void testConstructorShouldThrowIncorrectArgumentsCountException() {
-        assertThrows(IncorrectArgumentsCountException.class,
-            () -> new WithdrawMoneyCommand(new String[] {"10", "randomExtraString"}, selectionKey),
-            "An IncorrectArgumentsCountException is expected when args consists of two strings");
-    }
-
-    @Test
-    void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsNotANumber() {
-        assertThrows(InvalidCommandException.class,
-            () -> new WithdrawMoneyCommand(new String[] {"abc"}, selectionKey),
-            "An InvalidCommandException is expected when the amount is not in an appropriate format!");
-    }
-
-    @Test
     void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsZero() {
-        assertThrows(InvalidCommandException.class,
-            () -> new WithdrawMoneyCommand(new String[] {"0"}, selectionKey),
+        assertThrows(IllegalArgumentException.class,
+            () -> new WithdrawMoneyCommand(0, selectionKey),
             "An InvalidCommandException is expected when the amount is equal to 0!");
     }
 
     @Test
     void testConstructorShouldThrowInvalidCommandExceptionWhenAmountIsNegative() {
-        assertThrows(InvalidCommandException.class,
-            () -> new WithdrawMoneyCommand(new String[] {"-10"}, selectionKey),
+        assertThrows(IllegalArgumentException.class,
+            () -> new WithdrawMoneyCommand(-10d, selectionKey),
             "An InvalidCommandException is expected when the amount is below 0!");
     }
 

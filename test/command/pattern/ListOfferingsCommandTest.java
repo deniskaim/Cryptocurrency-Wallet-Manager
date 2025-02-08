@@ -1,7 +1,6 @@
 package command.pattern;
 
 import cryptowallet.offers.CryptoCatalog;
-import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +10,6 @@ import cryptowallet.offers.Offering;
 import user.User;
 
 import java.nio.channels.SelectionKey;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -19,46 +17,30 @@ import static org.mockito.Mockito.when;
 
 public class ListOfferingsCommandTest {
 
-    private String[] args;
     private CryptoWalletService cryptoWalletService;
     private SelectionKey selectionKey;
     private User user;
     private ListOfferingsCommand command;
 
     @BeforeEach
-    void setUp() throws IncorrectArgumentsCountException {
-        args = new String[0];
+    void setUp() {
         cryptoWalletService = Mockito.mock(CryptoWalletService.class);
         selectionKey = Mockito.mock(SelectionKey.class);
         user = Mockito.mock(User.class);
 
-        command = new ListOfferingsCommand(args, cryptoWalletService, selectionKey);
-    }
-
-    @Test
-    void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new ListOfferingsCommand(null, cryptoWalletService, selectionKey),
-            "An IllegalArgumentException is expected when args in ListOfferingsCommand is null reference!");
+        command = new ListOfferingsCommand(cryptoWalletService, selectionKey);
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenCryptoWalletServiceIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new ListOfferingsCommand(args, null, selectionKey),
+        assertThrows(IllegalArgumentException.class, () -> new ListOfferingsCommand(null, selectionKey),
             "An IllegalArgumentException is expected when cryptoWalletService in ListOfferingsCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenSelectionKeyIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new ListOfferingsCommand(args, cryptoWalletService, null),
+        assertThrows(IllegalArgumentException.class, () -> new ListOfferingsCommand(cryptoWalletService, null),
             "An IllegalArgumentException is expected when selectionKey in ListOfferingsCommand is null reference!");
-    }
-
-    @Test
-    void testConstructorShouldThrowIncorrectArgumentsCountException() {
-        assertThrows(IncorrectArgumentsCountException.class,
-            () -> new ListOfferingsCommand(new String[] {"onlyOneString"}, cryptoWalletService, selectionKey),
-            "An IncorrectArgumentsCountException is expected when ListOfferingsCommand contains one argument!");
     }
 
     @Test

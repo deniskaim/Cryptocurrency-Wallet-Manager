@@ -1,7 +1,6 @@
 package command.pattern;
 
 import exceptions.InvalidAssetException;
-import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.wallet.NoActiveInvestmentsException;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +18,6 @@ import static org.mockito.Mockito.when;
 
 public class GetWalletOverallSummaryCommandTest {
 
-    private String[] args;
     private CryptoWalletService cryptoWalletService;
     private SelectionKey selectionKey;
     private User user;
@@ -28,41 +26,26 @@ public class GetWalletOverallSummaryCommandTest {
     private GetWalletOverallSummaryCommand command;
 
     @BeforeEach
-    void setUp() throws IncorrectArgumentsCountException {
-        args = new String[0];
+    void setUp() {
         cryptoWalletService = Mockito.mock(CryptoWalletService.class);
         selectionKey = Mockito.mock(SelectionKey.class);
         user = Mockito.mock(User.class);
         cryptoWallet = Mockito.mock(CryptoWallet.class);
 
-        command = new GetWalletOverallSummaryCommand(args, cryptoWalletService, selectionKey);
-    }
-
-    @Test
-    void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
-        assertThrows(IllegalArgumentException.class,
-            () -> new GetWalletOverallSummaryCommand(null, cryptoWalletService, selectionKey),
-            "args in GetWalletOverallSummaryCommand cannot be null reference!");
+        command = new GetWalletOverallSummaryCommand(cryptoWalletService, selectionKey);
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenCryptoWalletServiceIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new GetWalletOverallSummaryCommand(args, null, selectionKey),
+        assertThrows(IllegalArgumentException.class, () -> new GetWalletOverallSummaryCommand(null, selectionKey),
             "cryptoWalletService in GetWalletOverallSummaryCommand cannot be null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenSelectionKeyIsNull() {
         assertThrows(IllegalArgumentException.class,
-            () -> new GetWalletOverallSummaryCommand(args, cryptoWalletService, null),
+            () -> new GetWalletOverallSummaryCommand(cryptoWalletService, null),
             "selectionKey in GetWalletOverallSummaryCommand cannot be null reference!");
-    }
-
-    @Test
-    void testConstructorShouldThrowIncorrectArgumentsCountException() {
-        assertThrows(IncorrectArgumentsCountException.class,
-            () -> new GetWalletOverallSummaryCommand(new String[] {"onlyOneString"}, cryptoWalletService, selectionKey),
-            "GetWalletOverallSummary command should not contain extra arguments!");
     }
 
     @Test

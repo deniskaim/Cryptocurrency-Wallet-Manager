@@ -1,7 +1,5 @@
 package command.pattern;
 
-import exceptions.command.IncorrectArgumentsCountException;
-import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,38 +16,23 @@ import static org.mockito.Mockito.when;
 
 public class LogOutCommandTest {
 
-    private String[] args;
     private SelectionKey selectionKey;
     private User user;
 
     private LogOutCommand command;
 
     @BeforeEach
-    void setUp() throws IncorrectArgumentsCountException, InvalidCommandException {
-        args = new String[0];
+    void setUp() {
         selectionKey = Mockito.mock(SelectionKey.class);
         user = Mockito.mock(User.class);
 
-        command = new LogOutCommand(args, selectionKey);
-    }
-
-    @Test
-    void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new LogOutCommand(null, selectionKey),
-            "An IllegalArgumentException is expected when args in LogOutCommand is null reference!");
+        command = new LogOutCommand(selectionKey);
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenSelectionKeyIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new LogOutCommand(args, null),
+        assertThrows(IllegalArgumentException.class, () -> new LogOutCommand(null),
             "An IllegalArgumentException is expected when selectionKey in LogOutCommand is null reference!");
-    }
-
-    @Test
-    void testConstructorShouldThrowIncorrectArgumentsCountException() {
-        assertThrows(IncorrectArgumentsCountException.class,
-            () -> new LogOutCommand(new String[] {"oneString"}, selectionKey),
-            "An IncorrectArgumentsCountException is expected when LogOutCommand contains one argument!");
     }
 
     @Test

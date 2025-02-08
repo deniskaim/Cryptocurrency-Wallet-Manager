@@ -1,6 +1,5 @@
 package command.pattern;
 
-import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 
 import java.io.IOException;
@@ -12,14 +11,7 @@ public class DisconnectCommand implements Command {
     private final SelectionKey selectionKey;
     private static final String SUCCESSFUL_MESSAGE = "You have been disconnected from the server!";
 
-    public DisconnectCommand(String[] args, SelectionKey selectionKey) throws IncorrectArgumentsCountException {
-        if (args == null) {
-            throw new IllegalArgumentException("args in Disconnect command cannot be null reference!");
-        }
-        if (args.length != 0) {
-            throw new IncorrectArgumentsCountException(
-                "Disconnect command should not contain arguments!");
-        }
+    public DisconnectCommand(SelectionKey selectionKey) {
         if (selectionKey == null) {
             throw new IllegalArgumentException("selectionKey in Disconnect command cannot be null reference!");
         }

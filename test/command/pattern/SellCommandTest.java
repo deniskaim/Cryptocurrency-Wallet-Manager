@@ -1,8 +1,6 @@
 package command.pattern;
 
 import exceptions.InvalidAssetException;
-import exceptions.command.IncorrectArgumentsCountException;
-import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.wallet.MissingInWalletAssetException;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,7 +18,7 @@ import static org.mockito.Mockito.when;
 
 public class SellCommandTest {
 
-    private String[] args;
+    private String assetID;
     private CryptoWalletService cryptoWalletService;
     private SelectionKey selectionKey;
     private User user;
@@ -29,47 +27,32 @@ public class SellCommandTest {
     private SellCommand sellCommand;
 
     @BeforeEach
-    void setUp() throws IncorrectArgumentsCountException, InvalidCommandException {
-        args = new String[] {"--offering=BTC"};
+    void setUp() {
+        assetID = "BTC";
         cryptoWalletService = Mockito.mock(CryptoWalletService.class);
         selectionKey = Mockito.mock(SelectionKey.class);
         user = Mockito.mock(User.class);
         cryptoWallet = Mockito.mock(CryptoWallet.class);
 
-        sellCommand = new SellCommand(args, cryptoWalletService, selectionKey);
+        sellCommand = new SellCommand(assetID, cryptoWalletService, selectionKey);
     }
 
     @Test
-    void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
+    void testConstructorShouldThrowIllegalArgumentExceptionWhenAssetIDIsNull() {
         assertThrows(IllegalArgumentException.class, () -> new SellCommand(null, cryptoWalletService, selectionKey),
-            "An IllegalArgumentException is expected when args in SellCommand is null reference!");
+            "An IllegalArgumentException is expected when assetID in SellCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenCryptoWalletServiceIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new SellCommand(args, null, selectionKey),
+        assertThrows(IllegalArgumentException.class, () -> new SellCommand(assetID, null, selectionKey),
             "An IllegalArgumentException is expected when cryptoWalletService in SellCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenSelectionKeyIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new SellCommand(args, cryptoWalletService, null),
+        assertThrows(IllegalArgumentException.class, () -> new SellCommand(assetID, cryptoWalletService, null),
             "An IllegalArgumentException is expected when selectionKey in SellCommand is null reference!");
-    }
-
-    @Test
-    void testConstructorShouldThrowIncorrectArgumentsCountException() {
-        assertThrows(IncorrectArgumentsCountException.class,
-            () -> new SellCommand(new String[] {"firstString", "secondString"}, cryptoWalletService, selectionKey),
-            "An IncorrectArgumentsCountException is expected when SellCommand contains one argument!");
-    }
-
-    @Test
-    void testConstructorShouldThrowInvalidCommandExceptionWhenOfferingCodeIsInvalid() {
-        assertThrows(
-            InvalidCommandException.class,
-            () -> new SellCommand(new String[] {"--invalidParam=BTC"}, cryptoWalletService, selectionKey),
-            "An InvalidCommandException is expected when the offering code string is invalid!");
     }
 
     @Test

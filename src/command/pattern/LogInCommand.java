@@ -1,6 +1,5 @@
 package command.pattern;
 
-import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.AlreadyLoggedInException;
 import exceptions.user.UserNotFoundException;
@@ -19,13 +18,13 @@ public class LogInCommand implements Command {
 
     private static final String SUCCESSFUL_MESSAGE = "You have successfully logged in as \"%s\"";
 
-    public LogInCommand(String[] args, UserAccountService userAccountService, SelectionKey selectionKey)
-        throws IncorrectArgumentsCountException {
-        if (args == null) {
-            throw new IllegalArgumentException("args in Login command cannot be null reference!");
+    public LogInCommand(String username, String password, UserAccountService userAccountService,
+                        SelectionKey selectionKey) {
+        if (username == null) {
+            throw new IllegalArgumentException("username in Login command cannot be null reference!");
         }
-        if (args.length != 2) {
-            throw new IncorrectArgumentsCountException("Login command should include just username and password!");
+        if (password == null) {
+            throw new IllegalArgumentException("password in Login command cannot be null reference!");
         }
         if (userAccountService == null) {
             throw new IllegalArgumentException("userAccountService cannot be null reference!");
@@ -34,8 +33,8 @@ public class LogInCommand implements Command {
             throw new IllegalArgumentException("selectionKey cannot be null reference!");
         }
 
-        this.username = args[0];
-        this.password = args[1];
+        this.username = username;
+        this.password = password;
         this.userAccountService = userAccountService;
         this.selectionKey = selectionKey;
     }

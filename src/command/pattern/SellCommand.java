@@ -1,8 +1,6 @@
 package command.pattern;
 
 import exceptions.InvalidAssetException;
-import exceptions.command.IncorrectArgumentsCountException;
-import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.wallet.MissingInWalletAssetException;
 import exceptions.user.NotLoggedInException;
@@ -11,24 +9,17 @@ import user.User;
 
 import java.nio.channels.SelectionKey;
 
-import static utils.TextUtils.getTheRestOfTheString;
-
 public class SellCommand implements Command {
 
     private final String assetID;
     private final CryptoWalletService cryptoWalletService;
     private final SelectionKey selectionKey;
 
-    private static final String OFFERING_CODE_INPUT_MESSAGE = "--offering=";
     private static final String SUCCESSFUL_MESSAGE = "You have successfully sold your %s for %f USD";
 
-    public SellCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey)
-        throws IncorrectArgumentsCountException, InvalidCommandException {
-        if (args == null) {
-            throw new IllegalArgumentException("args cannot be null reference");
-        }
-        if (args.length != 1) {
-            throw new IncorrectArgumentsCountException("Sell command should contain exactly one specific argument!");
+    public SellCommand(String assetID, CryptoWalletService cryptoWalletService, SelectionKey selectionKey) {
+        if (assetID == null) {
+            throw new IllegalArgumentException("assetID cannot be null reference");
         }
         if (cryptoWalletService == null) {
             throw new IllegalArgumentException("cryptoWalletService cannot be null reference!");
@@ -37,11 +28,7 @@ public class SellCommand implements Command {
             throw new IllegalArgumentException("selectionKey cannot be null reference!");
         }
 
-        try {
-            this.assetID = getTheRestOfTheString(args[0], OFFERING_CODE_INPUT_MESSAGE);
-        } catch (IllegalArgumentException e) {
-            throw new InvalidCommandException("Offering code string is invalid!", e);
-        }
+        this.assetID = assetID;
         this.selectionKey = selectionKey;
         this.cryptoWalletService = cryptoWalletService;
     }

@@ -12,6 +12,7 @@ import command.pattern.LogInCommand;
 import command.pattern.LogOutCommand;
 import command.pattern.RegisterCommand;
 import command.pattern.SellCommand;
+import command.pattern.WithdrawMoneyCommand;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.InvalidCommandException;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,11 +60,75 @@ public class CommandFactoryTest {
     }
 
     @Test
+    void testCreateCommandBuyInvalidOfferingCode() {
+        String commandMessage = "$ buy --wrongOffering=BTC --money=10";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the offering code is wrong!");
+    }
+
+    @Test
+    void testCreateCommandBuyInvalidMoneyCode() {
+        String commandMessage = "$ buy --offering=BTC --wrongMoney=10";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the money code is wrong!");
+    }
+
+    @Test
+    void testCreateCommandBuyMoneyInappropriateFormat() {
+        String commandMessage = "$ buy --offering=BTC --money=abc";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the money is in an inappropriate format!");
+    }
+
+    @Test
+    void testCreateCommandBuyMoneyIsZero() {
+        String commandMessage = "$ buy --offering=BTC --money=0";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the money is zero!");
+    }
+
+    @Test
+    void testCreateCommandBuyMoneyIsNegative() {
+        String commandMessage = "$ buy --offering=BTC --money=-10";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the money is negative!");
+    }
+
+    @Test
     void testCreateCommandDepositMoney() throws IncorrectArgumentsCountException, InvalidCommandException {
         String commandMessage = "$ deposit-money 10";
 
         Command command = commandFactory.createCommand(commandMessage, selectionKey);
         assertInstanceOf(DepositMoneyCommand.class, command, "A DepositMoneyCommand was expected!");
+    }
+
+    @Test
+    void testCreateCommandDepositMoneyInappropriateFormat() {
+        String commandMessage = "$ deposit-money abc";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the money is in an inappropriate format!");
+    }
+
+    @Test
+    void testCreateCommandDepositMoneyWhenZero() {
+        String commandMessage = "$ deposit-money 0";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the money is zero!");
+    }
+
+    @Test
+    void testCreateCommandDepositMoneyWhenNegative() {
+        String commandMessage = "$ deposit-money -10";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the money is negative!");
     }
 
     @Test
@@ -145,11 +210,59 @@ public class CommandFactoryTest {
     }
 
     @Test
+    void testCreateCommandSellInvalidOfferingCode() {
+        String commandMessage = "$ sell --wrongOffering=BTC";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the offering code is wrong!");
+    }
+
+    @Test
+    void testCreateCommandWithdrawMoney() throws IncorrectArgumentsCountException, InvalidCommandException {
+        String commandMessage = "$ withdraw-money 10";
+
+        Command command = commandFactory.createCommand(commandMessage, selectionKey);
+        assertInstanceOf(WithdrawMoneyCommand.class, command, "A WithdrawMoneyCommand was expected!");
+    }
+
+    @Test
+    void testCreateCommandWithdrawMoneyInappropriateFormat() {
+        String commandMessage = "$ withdraw-money abc";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the money is in an inappropriate format!");
+    }
+
+    @Test
+    void testCreateCommandWithdrawMoneyWhenZero() {
+        String commandMessage = "$ withdraw-money 0";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the money is zero!");
+    }
+
+    @Test
+    void testCreateCommandWithdrawMoneyWhenNegative() {
+        String commandMessage = "$ withdraw-money -10";
+
+        assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the money is negative!");
+    }
+
+    @Test
     void testCreateCommandInvalidCommandSymbol() {
         String commandMessage = "@ help";
 
         assertThrows(InvalidCommandException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
             "An InvalidCommandException is expected when the commandMessage begin with an invalid command symbol!");
+    }
+
+    @Test
+    void testCreateCommandWhenIncorrectArgumentsCount() {
+        String commandMessage = "$ login username";
+
+        assertThrows(IncorrectArgumentsCountException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+            "An InvalidCommandException is expected when the arguments' count is incorrect!");
     }
 
     @Test

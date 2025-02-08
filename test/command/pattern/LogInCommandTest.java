@@ -1,7 +1,5 @@
 package command.pattern;
 
-import exceptions.command.IncorrectArgumentsCountException;
-import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.UserNotFoundException;
 import exceptions.user.WrongPasswordException;
@@ -21,7 +19,8 @@ import static org.mockito.Mockito.when;
 
 public class LogInCommandTest {
 
-    private String[] args;
+    private String username;
+    private String password;
     private UserAccountService userAccountService;
     private SelectionKey selectionKey;
     private User user;
@@ -29,38 +28,41 @@ public class LogInCommandTest {
     private LogInCommand command;
 
     @BeforeEach
-    void setUp() throws IncorrectArgumentsCountException, InvalidCommandException {
-        args = new String[] {"username", "password"};
+    void setUp() {
+        username = "username";
+        password = "password";
         userAccountService = Mockito.mock(UserAccountService.class);
         selectionKey = Mockito.mock(SelectionKey.class);
         user = Mockito.mock(User.class);
 
-        command = new LogInCommand(args, userAccountService, selectionKey);
+        command = new LogInCommand(username, password, userAccountService, selectionKey);
     }
 
     @Test
-    void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new LogInCommand(null, userAccountService, selectionKey),
-            "An IllegalArgumentException is expected when args in LogInCommand is null reference!");
+    void testConstructorShouldThrowIllegalArgumentExceptionWhenUsernameIsNull() {
+        assertThrows(IllegalArgumentException.class,
+            () -> new LogInCommand(null, password, userAccountService, selectionKey),
+            "An IllegalArgumentException is expected when username in LogInCommand is null reference!");
+    }
+
+    @Test
+    void testConstructorShouldThrowIllegalArgumentExceptionWhenPasswordIsNull() {
+        assertThrows(IllegalArgumentException.class,
+            () -> new LogInCommand(username, null, userAccountService, selectionKey),
+            "An IllegalArgumentException is expected when password in LogInCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenUserAccountServiceIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new LogInCommand(args, null, selectionKey),
+        assertThrows(IllegalArgumentException.class, () -> new LogInCommand(username, password, null, selectionKey),
             "An IllegalArgumentException is expected when userAccountService in LogInCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenSelectionKeyIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new LogInCommand(args, userAccountService, null),
+        assertThrows(IllegalArgumentException.class,
+            () -> new LogInCommand(username, password, userAccountService, null),
             "An IllegalArgumentException is expected when selectionKey in LogInCommand is null reference!");
-    }
-
-    @Test
-    void testConstructorShouldThrowIncorrectArgumentsCountException() {
-        assertThrows(IncorrectArgumentsCountException.class,
-            () -> new LogInCommand(new String[] {"onlyOneString"}, userAccountService, selectionKey),
-            "An IncorrectArgumentsCountException is expected when LogInCommand contains one argument!");
     }
 
     @Test

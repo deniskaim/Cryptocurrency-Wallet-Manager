@@ -1,6 +1,5 @@
 package command.pattern;
 
-import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.UsernameAlreadyTakenException;
 import org.junit.jupiter.api.BeforeEach;
@@ -17,36 +16,37 @@ import static org.mockito.Mockito.verify;
 
 public class RegisterCommandTest {
 
-    private String[] args;
+    private String username;
+    private String password;
     private UserAccountService userAccountService;
 
     private RegisterCommand command;
 
     @BeforeEach
-    void setUp() throws IncorrectArgumentsCountException {
-        args = new String[] {"username", "password"};
+    void setUp() {
+        username = "username";
+        password = "password";
         userAccountService = Mockito.mock(UserAccountService.class);
 
-        command = new RegisterCommand(args, userAccountService);
+        command = new RegisterCommand(username, password, userAccountService);
     }
 
     @Test
-    void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new RegisterCommand(null, userAccountService),
-            "An IllegalArgumentException is expected when args in RegisterCommand is null reference!");
+    void testConstructorShouldThrowIllegalArgumentExceptionWhenUsernameIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> new RegisterCommand(null, password, userAccountService),
+            "An IllegalArgumentException is expected when username in RegisterCommand is null reference!");
+    }
+
+    @Test
+    void testConstructorShouldThrowIllegalArgumentExceptionWhenPasswordIsNull() {
+        assertThrows(IllegalArgumentException.class, () -> new RegisterCommand(username, null, userAccountService),
+            "An IllegalArgumentException is expected when password in RegisterCommand is null reference!");
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenUserAccountServiceIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new RegisterCommand(args, null),
+        assertThrows(IllegalArgumentException.class, () -> new RegisterCommand(username, password, null),
             "An IllegalArgumentException is expected when userAccountService in RegisterCommand is null reference!");
-    }
-
-    @Test
-    void testConstructorShouldThrowIncorrectArgumentsCountException() {
-        assertThrows(IncorrectArgumentsCountException.class,
-            () -> new RegisterCommand(new String[] {"onlyOneString"}, userAccountService),
-            "An IncorrectArgumentsCountException is expected when RegisterCommand contains one argument!");
     }
 
     @Test

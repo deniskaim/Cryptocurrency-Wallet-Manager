@@ -1,7 +1,6 @@
 package command.pattern;
 
 import cryptowallet.CryptoWalletSummary;
-import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,7 +16,6 @@ import static org.mockito.Mockito.when;
 
 public class GetWalletSummaryCommandTest {
 
-    private String[] args;
     private SelectionKey selectionKey;
     private CryptoWallet cryptoWallet;
     private User user;
@@ -25,31 +23,17 @@ public class GetWalletSummaryCommandTest {
     private GetWalletSummaryCommand command;
 
     @BeforeEach
-    void setUp() throws IncorrectArgumentsCountException {
-        args = new String[0];
+    void setUp() {
         selectionKey = Mockito.mock(SelectionKey.class);
         cryptoWallet = Mockito.mock(CryptoWallet.class);
         user = Mockito.mock(User.class);
-        command = new GetWalletSummaryCommand(args, selectionKey);
-    }
-
-    @Test
-    void testConstructorShouldThrowIllegalArgumentExceptionWhenArgsIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new GetWalletSummaryCommand(null, selectionKey),
-            "An IllegalArgumentException is expected when args in GetWalletSummaryCommand is null reference!");
+        command = new GetWalletSummaryCommand(selectionKey);
     }
 
     @Test
     void testConstructorShouldThrowIllegalArgumentExceptionWhenSelectionKeyIsNull() {
-        assertThrows(IllegalArgumentException.class, () -> new GetWalletSummaryCommand(args, null),
+        assertThrows(IllegalArgumentException.class, () -> new GetWalletSummaryCommand(null),
             "An IllegalArgumentException is expected when selectionKey in GetWalletSummaryCommand is null reference!");
-    }
-
-    @Test
-    void testConstructorShouldThrowIncorrectArgumentsCountException() {
-        assertThrows(IncorrectArgumentsCountException.class,
-            () -> new GetWalletSummaryCommand(new String[] {"invalidParam"}, selectionKey),
-            "An IncorrectArgumentsCountException is expected when GetWalletSummaryCommand contains an argument!");
     }
 
     @Test

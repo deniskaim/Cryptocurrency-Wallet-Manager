@@ -1,7 +1,5 @@
 package command.pattern;
 
-import exceptions.command.IncorrectArgumentsCountException;
-import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.NotLoggedInException;
 import user.User;
@@ -15,28 +13,17 @@ public class DepositMoneyCommand implements Command {
 
     private static final String SUCCESSFUL_MESSAGE = "You have successfully made a deposit of %f USD";
 
-    public DepositMoneyCommand(String[] args, SelectionKey selectionKey)
-        throws IncorrectArgumentsCountException, InvalidCommandException {
-        if (args == null) {
-            throw new IllegalArgumentException("args in DepositMoney command cannot be null reference!");
-        }
+    public DepositMoneyCommand(double amount, SelectionKey selectionKey) {
         if (selectionKey == null) {
             throw new IllegalArgumentException("selectionKey cannot be null reference!");
         }
-        if (args.length != 1) {
-            throw new IncorrectArgumentsCountException("Deposit command should contain exactly one specific argument!");
-        }
-        try {
-            this.amount = Double.parseDouble(args[0]);
-            this.selectionKey = selectionKey;
-        } catch (NumberFormatException e) {
-            throw new InvalidCommandException("The amount in the deposit-money command is not in an appropriate format",
-                e);
-        }
-        if (Double.compare(this.amount, 0d) <= 0) {
-            throw new InvalidCommandException(
+        if (Double.compare(amount, 0d) <= 0) {
+            throw new IllegalArgumentException(
                 "The amount in the deposit-money command cannot be below or equal to 0.00 USD");
         }
+
+        this.amount = amount;
+        this.selectionKey = selectionKey;
     }
 
     @Override

@@ -1,7 +1,6 @@
 package command.pattern;
 
 import cryptowallet.offers.CryptoCatalog;
-import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.user.NotLoggedInException;
 import cryptowallet.CryptoWalletService;
@@ -14,16 +13,7 @@ public class ListOfferingsCommand implements Command {
     private final CryptoWalletService cryptoWalletService;
     private final SelectionKey selectionKey;
 
-    public ListOfferingsCommand(String[] args, CryptoWalletService cryptoWalletService, SelectionKey selectionKey)
-        throws IncorrectArgumentsCountException {
-        if (args == null) {
-            throw new IllegalArgumentException(
-                "args in ListOfferings command cannot be null reference!");
-        }
-        if (args.length != 0) {
-            throw new IncorrectArgumentsCountException(
-                "ListOfferings command should not contain arguments!");
-        }
+    public ListOfferingsCommand(CryptoWalletService cryptoWalletService, SelectionKey selectionKey) {
         if (cryptoWalletService == null) {
             throw new IllegalArgumentException("cryptoWalletService cannot be null reference!");
         }

@@ -1,7 +1,6 @@
 package command.pattern;
 
 import exceptions.InvalidAssetException;
-import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.wallet.NoActiveInvestmentsException;
 import exceptions.user.NotLoggedInException;
@@ -19,16 +18,8 @@ public class GetWalletOverallSummaryCommand implements Command {
     private static final String LOSS_MESSAGE = "Current loss: %f USD. Investing always carries risks! Be patient!";
     private static final String NEUTRAL_MESSAGE = "No profit or loss at the moment. Your investments are safe!";
 
-    public GetWalletOverallSummaryCommand(String[] args, CryptoWalletService cryptoWalletService,
-                                          SelectionKey selectionKey) throws IncorrectArgumentsCountException {
-        if (args == null) {
-            throw new IllegalArgumentException(
-                "args in GetWalletOverallSummaryCommand cannot be null reference!");
-        }
-        if (args.length != 0) {
-            throw new IncorrectArgumentsCountException(
-                "GetWalletOverallSummary command should not contain arguments!");
-        }
+    public GetWalletOverallSummaryCommand(CryptoWalletService cryptoWalletService,
+                                          SelectionKey selectionKey) {
         if (cryptoWalletService == null) {
             throw new IllegalArgumentException("cryptoWalletService cannot be null reference!");
         }
