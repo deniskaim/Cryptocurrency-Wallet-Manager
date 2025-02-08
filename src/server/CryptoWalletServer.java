@@ -24,6 +24,7 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CryptoWalletServer {
 
@@ -38,7 +39,7 @@ public class CryptoWalletServer {
     private final CommandExecutor commandExecutor;
 
     private Selector selector;
-    private boolean isRunning = true;
+    private AtomicBoolean isRunning;
 
     public CryptoWalletServer(int port, CommandExecutor commandExecutor) {
         this.serverPort = port;
@@ -54,8 +55,7 @@ public class CryptoWalletServer {
     public void start() {
         try (ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
              UserRepository userRepository = new UserRepository();
-             CoinApiClient coinApiClient =
-                 new CoinApiClient(HttpClient.newHttpClient(), APIKEY);
+             CoinApiClient coinApiClient = new CoinApiClient(HttpClient.newHttpClient(), APIKEY);
              ExecutorService executor = Executors.newSingleThreadExecutor()) {
 
             selector = Selector.open();
@@ -63,7 +63,8 @@ public class CryptoWalletServer {
             commandFactory = createCommandFactory(userRepository, coinApiClient);
             Runnable listenForStopCommandRunnable = new StopServerRunnable(this);
             executor.submit(listenForStopCommandRunnable);
-            while (isRunning) {
+            isRunning.set(true);
+            while (isRunning.get()) {
                 try {
                     int readyChannels = selector.select();
                     if (readyChannels == 0) {
@@ -72,7 +73,7 @@ public class CryptoWalletServer {
                     Set<SelectionKey> selectedKeys = selector.selectedKeys();
                     iterateSelectedKeys(selectedKeys);
                 } catch (IOException e) {
-                    System.out.println("Error occurred while processing client request: " + e.getMessage());
+                    // System.out.println("Error occurred while processing client request: " + e.getMessage());
                 } catch (RuntimeException e) {
                     System.out.println("Client made an invalid request!");
                 }
@@ -83,7 +84,7 @@ public class CryptoWalletServer {
     }
 
     public void stop() {
-        isRunning = false;
+        isRunning.set(false);
         if (selector.isOpen()) {
             selector.wakeup();
         }

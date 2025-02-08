@@ -13,7 +13,7 @@ public class DepositMoneyCommand implements Command {
     private final double amount;
     private final SelectionKey selectionKey;
 
-    private static final String SUCCESSFUL_MESSAGE = "You have successfully made a deposit of %f";
+    private static final String SUCCESSFUL_MESSAGE = "You have successfully made a deposit of %f USD";
 
     public DepositMoneyCommand(String[] args, SelectionKey selectionKey)
         throws IncorrectArgumentsCountException, InvalidCommandException {
@@ -35,7 +35,7 @@ public class DepositMoneyCommand implements Command {
         }
         if (Double.compare(this.amount, 0d) <= 0) {
             throw new InvalidCommandException(
-                "The amount in the deposit-money command cannot be below 0.00 or equal to USD");
+                "The amount in the deposit-money command cannot be below or equal to 0.00 USD");
         }
     }
 
