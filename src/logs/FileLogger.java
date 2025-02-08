@@ -53,7 +53,7 @@ public class FileLogger {
 
     private static ConsoleHandler configureConsoleHandler() {
         ConsoleHandler consoleHandler = new ConsoleHandler();
-        consoleHandler.setLevel(Level.INFO);
+        consoleHandler.setLevel(Level.ALL);
         consoleHandler.setFormatter(new SimpleFormatter());
         return consoleHandler;
     }

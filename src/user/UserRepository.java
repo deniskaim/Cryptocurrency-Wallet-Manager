@@ -15,11 +15,18 @@ import java.util.Map;
 import static utils.HashingAlgorithm.hashPassword;
 
 public class UserRepository implements AutoCloseable {
-    private static final String FILE_NAME = "CryptoWalletUsersData.txt";
+    private final String fileName;
     private final Map<String, User> mapUsernameAccount;
 
-    public UserRepository() throws IOException, ClassNotFoundException {
+    public UserRepository(String fileName) {
+        this.fileName = fileName;
         this.mapUsernameAccount = loadSavedRegisteredUsers();
+    }
+
+    // for testing purposes
+    UserRepository(Map<String, User> mapUsernameAccount, String fileName) {
+        this.fileName = fileName;
+        this.mapUsernameAccount = mapUsernameAccount;
     }
 
     public void saveUser(User user) {
@@ -58,13 +65,13 @@ public class UserRepository implements AutoCloseable {
         saveUsersToFile();
     }
 
-    private Map<String, User> loadSavedRegisteredUsers() throws IOException, ClassNotFoundException {
+    private Map<String, User> loadSavedRegisteredUsers() {
         Map<String, User> usersFromFile = new HashMap<>();
 
-        try (ObjectInputStream reader = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
+        try (ObjectInputStream reader = new ObjectInputStream(new FileInputStream(fileName))) {
             usersFromFile = (Map<String, User>) reader.readObject();
         } catch (FileNotFoundException e) {
-            FileLogger.logError("File not found: " + FILE_NAME, e);
+            FileLogger.logError("File not found: " + fileName, e);
             return usersFromFile;
         } catch (IOException | ClassNotFoundException e) {
             throw new RuntimeException("An error occurred while loading the saved registered users!", e);
@@ -74,7 +81,7 @@ public class UserRepository implements AutoCloseable {
 
     private void saveUsersToFile() {
         try {
-            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(FILE_NAME))) {
+            try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(fileName))) {
                 objectOutputStream.writeObject(mapUsernameAccount);
             }
         } catch (IOException e) {
