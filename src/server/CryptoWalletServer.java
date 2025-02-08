@@ -36,19 +36,18 @@ public class CryptoWalletServer {
     private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
 
     private CommandFactory commandFactory;
-    private final CommandExecutor commandExecutor;
+    private final CommandExecutor commandExecutor = new CommandExecutor();
 
     private Selector selector;
-    private AtomicBoolean isRunning;
+    private final AtomicBoolean isRunning = new AtomicBoolean(true);
 
-    public CryptoWalletServer(int port, CommandExecutor commandExecutor) {
+    public CryptoWalletServer(int port) {
         this.serverPort = port;
-        this.commandExecutor = commandExecutor;
     }
 
     public static void main(String[] args) {
         final int port = 8888;
-        CryptoWalletServer cryptoWalletServer = new CryptoWalletServer(port, new CommandExecutor());
+        CryptoWalletServer cryptoWalletServer = new CryptoWalletServer(port);
         cryptoWalletServer.start();
     }
 
@@ -60,10 +59,9 @@ public class CryptoWalletServer {
 
             selector = Selector.open();
             configureServerSocket(serverSocketChannel);
+            configureServerStopThread(executor);
             commandFactory = createCommandFactory(userRepository, coinApiClient);
-            Runnable listenForStopCommandRunnable = new StopServerRunnable(this);
-            executor.submit(listenForStopCommandRunnable);
-            isRunning.set(true);
+
             while (isRunning.get()) {
                 try {
                     int readyChannels = selector.select();
@@ -74,8 +72,8 @@ public class CryptoWalletServer {
                     iterateSelectedKeys(selectedKeys);
                 } catch (IOException e) {
                     // System.out.println("Error occurred while processing client request: " + e.getMessage());
-                } catch (RuntimeException e) {
-                    System.out.println("Client made an invalid request!");
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Invalid input occurred!");
                 }
             }
         } catch (IOException e) {
@@ -92,9 +90,6 @@ public class CryptoWalletServer {
 
     private void configureServerSocket(ServerSocketChannel serverSocketChannel)
         throws IOException {
-        if (serverSocketChannel == null) {
-            throw new IllegalArgumentException("serverSocketChannel cannot be null reference!");
-        }
         serverSocketChannel.bind(new InetSocketAddress(SERVER_HOST, serverPort));
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -118,9 +113,6 @@ public class CryptoWalletServer {
     }
 
     private void handleAcceptableSelectionKey(SelectionKey selectionKey) throws IOException {
-        if (selectionKey == null || !selectionKey.isAcceptable()) {
-            throw new IllegalArgumentException("The selectionKey is invalid!");
-        }
         ServerSocketChannel serverSocketChannel = (ServerSocketChannel) selectionKey.channel();
         SocketChannel socketChannel = serverSocketChannel.accept();
 
@@ -129,11 +121,11 @@ public class CryptoWalletServer {
     }
 
     private void handleReadableSelectionKey(SelectionKey selectionKey) throws IOException {
-        if (selectionKey == null || !selectionKey.isReadable()) {
-            throw new IllegalArgumentException("The selectionKey is invalid!");
-        }
         SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
         String clientMessage = readFromClient(socketChannel);
+        if (clientMessage == null) {
+            return;
+        }
         executeCommand(clientMessage, selectionKey);
     }
 
@@ -142,7 +134,7 @@ public class CryptoWalletServer {
         int resultRead = socketChannel.read(buffer);
         if (resultRead < 0) {
             socketChannel.close();
-            throw new IllegalStateException("Read operation is unsuccessful!");
+            return null;
         }
 
         buffer.flip();
@@ -156,16 +148,16 @@ public class CryptoWalletServer {
         buffer.clear();
         buffer.put(message.getBytes());
         buffer.flip();
-        socketChannel.write(buffer);
+        if (socketChannel.isOpen()) {
+            socketChannel.write(buffer);
+        }
     }
 
     private void executeCommand(String clientMessage, SelectionKey selectionKey) throws IOException {
         try {
             Command clientCommand = commandFactory.createCommand(clientMessage, selectionKey);
             String successfulMessage = commandExecutor.executeCommand(clientCommand);
-            if (selectionKey.channel().isOpen()) {
-                writeToClient(successfulMessage, (SocketChannel) selectionKey.channel());
-            }
+            writeToClient(successfulMessage, (SocketChannel) selectionKey.channel());
         } catch (InvalidCommandException | IncorrectArgumentsCountException | UnsuccessfulCommandException e) {
             String exceptionMessage = e.getMessage();
             writeToClient(exceptionMessage, (SocketChannel) selectionKey.channel());
@@ -177,5 +169,10 @@ public class CryptoWalletServer {
         CryptoWalletService cryptoWalletService = new CryptoWalletService(coinApiClient);
 
         return CommandFactory.getInstance(userAccountService, cryptoWalletService);
+    }
+
+    private void configureServerStopThread(ExecutorService executor) {
+        Runnable listenForStopCommandRunnable = new StopServerRunnable(this);
+        executor.submit(listenForStopCommandRunnable);
     }
 }

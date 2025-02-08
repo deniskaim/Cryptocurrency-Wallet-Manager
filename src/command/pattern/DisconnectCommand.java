@@ -31,6 +31,7 @@ public class DisconnectCommand implements Command {
         try {
             SocketChannel socketChannel = (SocketChannel) selectionKey.channel();
             socketChannel.close();
+            selectionKey.cancel();
             return SUCCESSFUL_MESSAGE;
         } catch (IOException e) {
             throw new UnsuccessfulCommandException("Disconnect command is unsuccessful! " + e.getMessage(), e);
