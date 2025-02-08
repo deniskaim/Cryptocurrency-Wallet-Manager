@@ -6,6 +6,7 @@ import exceptions.InvalidAssetException;
 import exceptions.api.CryptoClientException;
 import exceptions.api.apikey.InvalidApiKeyException;
 import coinapi.dto.Asset;
+import logs.FileLogger;
 
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
@@ -74,18 +75,10 @@ public class CoinApiClient implements AutoCloseable {
     }
 
     private void startUpdatingAssets() {
-        scheduledExecutor.scheduleAtFixedRate(() -> {
-            try {
-                updateAssets();
-            } catch (InvalidApiKeyException e) {
-                throw new RuntimeException("ApiKey is invalid! Try with another one!", e);
-            } catch (CryptoClientException e) {
-                throw new RuntimeException("A problem with the CoinAPI request occurred!", e);
-            }
-        }, 0, UPDATE_CRYPTO_ASSETS_INTERVAL, TimeUnit.MINUTES);
+        scheduledExecutor.scheduleAtFixedRate(this::updateAssets, 0, UPDATE_CRYPTO_ASSETS_INTERVAL, TimeUnit.MINUTES);
     }
 
-    private void updateAssets() throws CryptoClientException {
+    private void updateAssets() {
         List<Asset> assetList = getAssetsFromAPI();
         int countToReturn = min(assetList.size(), MAX_ASSETS_COUNT);
 
@@ -98,7 +91,7 @@ public class CoinApiClient implements AutoCloseable {
         allAssets.putAll(updatedAssets);
     }
 
-    private List<Asset> getAssetsFromAPI() throws CryptoClientException {
+    private List<Asset> getAssetsFromAPI() {
         HttpResponse<String> responseFromAPI;
         try {
             URI uri = new URI(SCHEME, HOST, PATH_ALL_ASSETS, String.format(QUERY, apiKey), null);
@@ -111,7 +104,7 @@ public class CoinApiClient implements AutoCloseable {
         return getAssetsFromResponse(responseFromAPI);
     }
 
-    private List<Asset> getAssetsFromResponse(HttpResponse<String> response) throws InvalidApiKeyException {
+    private List<Asset> getAssetsFromResponse(HttpResponse<String> response) {
         Type listType = new TypeToken<List<Asset>>() {
         }.getType();
         List<Asset> assets = GSON.fromJson(response.body(), listType);

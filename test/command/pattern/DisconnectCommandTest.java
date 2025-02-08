@@ -70,5 +70,6 @@ public class DisconnectCommandTest {
 
         assertEquals("You have been disconnected from the server!", result);
         verify(socketChannel, times(1)).close();
+        verify(selectionKey, times(1)).cancel();
     }
 }

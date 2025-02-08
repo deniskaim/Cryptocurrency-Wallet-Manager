@@ -1,6 +1,6 @@
 package exceptions.api;
 
-public class CryptoClientException extends Exception {
+public class CryptoClientException extends RuntimeException {
     public CryptoClientException(String message) {
         super(message);
     }

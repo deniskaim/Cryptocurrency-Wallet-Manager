@@ -8,6 +8,8 @@ import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
 import cryptowallet.CryptoWalletService;
+import logs.FileLogger;
+import user.User;
 import user.UserAccountService;
 import user.UserRepository;
 
@@ -61,7 +63,6 @@ public class CryptoWalletServer {
             configureServerSocket(serverSocketChannel);
             configureServerStopThread(executor);
             commandFactory = createCommandFactory(userRepository, coinApiClient);
-
             while (isRunning.get()) {
                 try {
                     int readyChannels = selector.select();
@@ -71,13 +72,13 @@ public class CryptoWalletServer {
                     Set<SelectionKey> selectedKeys = selector.selectedKeys();
                     iterateSelectedKeys(selectedKeys);
                 } catch (IOException e) {
-                    // System.out.println("Error occurred while processing client request: " + e.getMessage());
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Invalid input occurred!");
+                    FileLogger.logError("An IOException occurred while processing a client's request!", e);
                 }
             }
         } catch (IOException e) {
-            throw new RuntimeException("A problem with the server socket has arisen", e);
+            FileLogger.logError("An IOException occurred while trying to start the CryptoWalletServer!", e);
+        } catch (Exception e) {
+            FileLogger.logError("An unexpected error occurred while the server was running!", e);
         }
     }
 
@@ -88,8 +89,7 @@ public class CryptoWalletServer {
         }
     }
 
-    private void configureServerSocket(ServerSocketChannel serverSocketChannel)
-        throws IOException {
+    private void configureServerSocket(ServerSocketChannel serverSocketChannel) throws IOException {
         serverSocketChannel.bind(new InetSocketAddress(SERVER_HOST, serverPort));
         serverSocketChannel.configureBlocking(false);
         serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);
@@ -161,6 +161,12 @@ public class CryptoWalletServer {
         } catch (InvalidCommandException | IncorrectArgumentsCountException | UnsuccessfulCommandException e) {
             String exceptionMessage = e.getMessage();
             writeToClient(exceptionMessage, (SocketChannel) selectionKey.channel());
+        } catch (IllegalArgumentException e) {
+            if (selectionKey.attachment() != null) {
+                User user = (User) selectionKey.attachment();
+                String username = user.authenticationData().getUsername();
+                FileLogger.logError("An unexpected error occurred while handling the request of user: " + username, e);
+            }
         }
     }
 

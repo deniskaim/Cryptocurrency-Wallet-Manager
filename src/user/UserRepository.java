@@ -1,6 +1,7 @@
 package user;
 
 import exceptions.user.WrongPasswordException;
+import logs.FileLogger;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -17,7 +18,7 @@ public class UserRepository implements AutoCloseable {
     private static final String FILE_NAME = "CryptoWalletUsersData.txt";
     private final Map<String, User> mapUsernameAccount;
 
-    public UserRepository() {
+    public UserRepository() throws IOException, ClassNotFoundException {
         this.mapUsernameAccount = loadSavedRegisteredUsers();
     }
 
@@ -57,15 +58,16 @@ public class UserRepository implements AutoCloseable {
         saveUsersToFile();
     }
 
-    private Map<String, User> loadSavedRegisteredUsers() {
+    private Map<String, User> loadSavedRegisteredUsers() throws IOException, ClassNotFoundException {
         Map<String, User> usersFromFile = new HashMap<>();
 
         try (ObjectInputStream reader = new ObjectInputStream(new FileInputStream(FILE_NAME))) {
             usersFromFile = (Map<String, User>) reader.readObject();
         } catch (FileNotFoundException e) {
+            FileLogger.logError("File not found: " + FILE_NAME, e);
             return usersFromFile;
         } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("A problem occurred while loading the registered users!", e);
+            throw new RuntimeException("An error occurred while loading the saved registered users!", e);
         }
         return usersFromFile;
     }
@@ -76,7 +78,7 @@ public class UserRepository implements AutoCloseable {
                 objectOutputStream.writeObject(mapUsernameAccount);
             }
         } catch (IOException e) {
-            throw new RuntimeException("Could not save the users to the file!", e);
+            FileLogger.logError("An error occurred while trying to save the users to the file!", e);
         }
     }
 
