@@ -34,7 +34,7 @@ public class CryptoWalletServer {
     public final int serverPort;
     private static final String SERVER_HOST = "localhost";
     private static final String APIKEY = "146865f1-12e8-4f3e-b75d-6d793420e4ae";
-    private static final String REPOSITORY_FILE_NAME = "CryptoWalletUsersData.txt";
+    private static final String REPOSITORY_FILE_NAME = "CryptoWalletUsersData.dat";
 
     private static final int BUFFER_SIZE = 2048;
     private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);

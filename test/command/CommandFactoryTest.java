@@ -261,7 +261,8 @@ public class CommandFactoryTest {
     void testCreateCommandWhenIncorrectArgumentsCount() {
         String commandMessage = "$ login username";
 
-        assertThrows(IncorrectArgumentsCountException.class, () -> commandFactory.createCommand(commandMessage, selectionKey),
+        assertThrows(IncorrectArgumentsCountException.class,
+            () -> commandFactory.createCommand(commandMessage, selectionKey),
             "An InvalidCommandException is expected when the arguments' count is incorrect!");
     }
 

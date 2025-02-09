@@ -3,7 +3,6 @@ package coinapi;
 import coinapi.client.CoinApiClient;
 import coinapi.dto.Asset;
 import com.google.gson.Gson;
-import exceptions.InvalidAssetException;
 import exceptions.api.CryptoClientException;
 import exceptions.api.apikey.InvalidApiKeyException;
 import org.junit.jupiter.api.BeforeEach;

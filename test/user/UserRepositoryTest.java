@@ -34,7 +34,7 @@ public class UserRepositoryTest {
 
     @BeforeEach
     void setUp() {
-        userRepository = new UserRepository(getUsers(), "repositoryTest.txt");
+        userRepository = new UserRepository(getUsers(), "repositoryTest.dat");
     }
 
     @Test
@@ -118,7 +118,7 @@ public class UserRepositoryTest {
         userRepository.close();
 
         Map<String, User> loadedUsers;
-        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("repositoryTest.txt"))) {
+        try (ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream("repositoryTest.dat"))) {
             loadedUsers = (Map<String, User>) objectInputStream.readObject();
         }
 
@@ -135,15 +135,15 @@ public class UserRepositoryTest {
         );
 
         try (ObjectOutputStream objectOutputStream = new ObjectOutputStream(
-            new FileOutputStream("repositoryTest.txt"))) {
+            new FileOutputStream("repositoryTest.dat"))) {
             objectOutputStream.writeObject(testUsers);
         }
 
-        userRepository = new UserRepository("repositoryTest.txt");
+        userRepository = new UserRepository("repositoryTest.dat");
     }
 
     private void tearDown() {
-        File file = new File("repositoryTest.txt");
+        File file = new File("repositoryTest.dat");
         file.delete();
     }
 }
