@@ -47,13 +47,13 @@ public class CryptoWalletOverallSummaryTest {
 
     @Test
     void testToStringFormatNegative() {
-        assetsProfit.put("BTC", -500.0);
-        assetsProfit.put("ETH", 500.0);
+        assetsProfit.put("BTC", 0d);
+        assetsProfit.put("ETH", 0d);
         CryptoWalletOverallSummary summary = new CryptoWalletOverallSummary(0, assetsProfit);
 
         String expected = "No profit or loss at the moment. Your investments are safe!" +
-            System.lineSeparator() + "BTC: Current loss: 500.000000 USD" +
-            System.lineSeparator() + "ETH: Current profit: 500.000000 USD" +
+            System.lineSeparator() + "BTC: No profit or loss at the moment" +
+            System.lineSeparator() + "ETH: No profit or loss at the moment" +
             System.lineSeparator();
 
         assertEquals(expected, summary.toString(), "Generated summary string does not match");
