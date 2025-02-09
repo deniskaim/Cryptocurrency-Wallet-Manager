@@ -65,6 +65,10 @@ public class UserRepository implements AutoCloseable {
         saveUsersToFile();
     }
 
+    public Map<String, User> getUsers() {
+        return mapUsernameAccount;
+    }
+
     private Map<String, User> loadSavedRegisteredUsers() {
         Map<String, User> usersFromFile = new HashMap<>();
 

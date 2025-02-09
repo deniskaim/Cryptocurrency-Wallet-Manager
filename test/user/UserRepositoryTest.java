@@ -104,9 +104,11 @@ public class UserRepositoryTest {
     public void testConstructor() throws IOException {
         setUpFile();
 
-        assertTrue(userRepository.userExists("username1"));
-        assertTrue(userRepository.userExists("username2"));
-        assertFalse(userRepository.userExists("username3"));
+        Map<String, User> users = userRepository.getUsers();
+
+        assertTrue(users.containsKey("username1"));
+        assertTrue(users.containsKey("username2"));
+        assertFalse(users.containsKey("username3"));
 
         tearDown();
     }
