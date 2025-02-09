@@ -6,7 +6,6 @@ import exceptions.wallet.InsufficientFundsException;
 import exceptions.InvalidAssetException;
 import exceptions.wallet.MissingInWalletAssetException;
 import exceptions.wallet.NoActiveInvestmentsException;
-import coinapi.client.CoinApiClient;
 import coinapi.dto.Asset;
 
 import java.util.List;
@@ -14,17 +13,17 @@ import java.util.Map;
 
 public class CryptoWalletService {
 
-    private final CoinApiClient coinApiClient;
+    private final AssetStorage assetStorage;
 
-    public CryptoWalletService(CoinApiClient coinApiClient) {
-        if (coinApiClient == null) {
-            throw new IllegalArgumentException("coinApiClient cannot be null reference!");
+    public CryptoWalletService(AssetStorage assetStorage) {
+        if (assetStorage == null) {
+            throw new IllegalArgumentException("assetStorage cannot be null reference!");
         }
-        this.coinApiClient = coinApiClient;
+        this.assetStorage = assetStorage;
     }
 
     public CryptoCatalog getCryptoCatalogWithOfferings() {
-        List<Asset> assets = coinApiClient.getAllAssets();
+        List<Asset> assets = assetStorage.getAllAssets();
         List<Offering> offerings = assets.stream()
             .map(asset -> Offering.of(asset.assetID(), asset.price()))
             .toList();
@@ -99,6 +98,6 @@ public class CryptoWalletService {
     }
 
     private Asset getAssetByAssetID(String assetID) throws InvalidAssetException {
-        return coinApiClient.getAsset(assetID);
+        return assetStorage.getAsset(assetID);
     }
 }

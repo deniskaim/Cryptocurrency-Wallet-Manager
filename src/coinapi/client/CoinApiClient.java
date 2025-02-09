@@ -6,7 +6,6 @@ import exceptions.InvalidAssetException;
 import exceptions.api.CryptoClientException;
 import exceptions.api.apikey.InvalidApiKeyException;
 import coinapi.dto.Asset;
-import logs.FileLogger;
 
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
@@ -24,21 +23,15 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.Math.min;
 
-public class CoinApiClient implements AutoCloseable {
+public class CoinApiClient {
 
     private static final String SCHEME = "https";
     private static final String HOST = "rest.coinapi.io";
     private static final String PATH_ALL_ASSETS = "/v1/assets";
     private static final String QUERY = "apikey=%s";
 
-    private static final int MAX_ASSETS_COUNT = 50;
-    private static final int UPDATE_CRYPTO_ASSETS_INTERVAL = 30;
-
     private final HttpClient cryptoHttpClient;
     private final String apiKey;
-
-    private final Map<String, Asset> allAssets = new ConcurrentHashMap<>();
-    private final ScheduledExecutorService scheduledExecutor = Executors.newSingleThreadScheduledExecutor();
 
     private static final Gson GSON = new Gson();
 
@@ -51,47 +44,9 @@ public class CoinApiClient implements AutoCloseable {
         }
         this.cryptoHttpClient = cryptoHttpClient;
         this.apiKey = apiKey;
-
-        startUpdatingAssets();
     }
 
-    public List<Asset> getAllAssets() {
-        return new ArrayList<>(allAssets.values());
-    }
-
-    public Asset getAsset(String assetID) throws InvalidAssetException {
-        if (assetID == null) {
-            throw new IllegalArgumentException("assetID cannot be null reference!");
-        }
-        if (!allAssets.containsKey(assetID)) {
-            throw new InvalidAssetException("There is no asset with this assetID!");
-        }
-        return allAssets.get(assetID);
-    }
-
-    @Override
-    public void close() {
-        scheduledExecutor.shutdown();
-    }
-
-    private void startUpdatingAssets() {
-        scheduledExecutor.scheduleAtFixedRate(this::updateAssets, 0, UPDATE_CRYPTO_ASSETS_INTERVAL, TimeUnit.MINUTES);
-    }
-
-    private void updateAssets() {
-        List<Asset> assetList = getAssetsFromAPI();
-        int countToReturn = min(assetList.size(), MAX_ASSETS_COUNT);
-
-        Map<String, Asset> updatedAssets = new ConcurrentHashMap<>();
-        assetList.stream()
-            .filter(asset -> asset.typeIsCrypto() == 1 && Double.compare(asset.price(), 0d) == 1)
-            .limit(countToReturn)
-            .forEach(asset -> updatedAssets.put(asset.assetID(), asset));
-
-        allAssets.putAll(updatedAssets);
-    }
-
-    private List<Asset> getAssetsFromAPI() {
+    public List<Asset> getAssetsFromAPI() {
         HttpResponse<String> responseFromAPI;
         try {
             URI uri = new URI(SCHEME, HOST, PATH_ALL_ASSETS, String.format(QUERY, apiKey), null);

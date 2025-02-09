@@ -4,6 +4,7 @@ import coinapi.client.CoinApiClient;
 import command.CommandExecutor;
 import command.CommandFactory;
 import command.pattern.Command;
+import cryptowallet.AssetStorage;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;
@@ -40,6 +41,7 @@ public class CryptoWalletServer {
 
     private CommandFactory commandFactory;
     private final CommandExecutor commandExecutor = new CommandExecutor();
+    private final CoinApiClient coinApiClient = new CoinApiClient(HttpClient.newHttpClient(), APIKEY);
 
     private Selector selector;
     private final AtomicBoolean isRunning = new AtomicBoolean(true);
@@ -57,13 +59,13 @@ public class CryptoWalletServer {
     public void start() {
         try (ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
              UserRepository userRepository = new UserRepository(REPOSITORY_FILE_NAME);
-             CoinApiClient coinApiClient = new CoinApiClient(HttpClient.newHttpClient(), APIKEY);
+             AssetStorage assetStorage = new AssetStorage(coinApiClient);
              ExecutorService executor = Executors.newSingleThreadExecutor()) {
 
             selector = Selector.open();
             configureServerSocket(serverSocketChannel);
             configureServerStopThread(executor);
-            commandFactory = createCommandFactory(userRepository, coinApiClient);
+            commandFactory = createCommandFactory(userRepository, assetStorage);
             while (isRunning.get()) {
                 try {
                     int readyChannels = selector.select();
@@ -171,9 +173,9 @@ public class CryptoWalletServer {
         }
     }
 
-    private CommandFactory createCommandFactory(UserRepository userRepository, CoinApiClient coinApiClient) {
+    private CommandFactory createCommandFactory(UserRepository userRepository, AssetStorage assetStorage) {
         UserAccountService userAccountService = new UserAccountService(userRepository);
-        CryptoWalletService cryptoWalletService = new CryptoWalletService(coinApiClient);
+        CryptoWalletService cryptoWalletService = new CryptoWalletService(assetStorage);
 
         return CommandFactory.getInstance(userAccountService, cryptoWalletService);
     }
