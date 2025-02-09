@@ -4,7 +4,7 @@ import coinapi.client.CoinApiClient;
 import command.CommandExecutor;
 import command.CommandFactory;
 import command.pattern.Command;
-import cryptowallet.AssetStorage;
+import storage.AssetStorage;
 import exceptions.command.IncorrectArgumentsCountException;
 import exceptions.command.InvalidCommandException;
 import exceptions.command.UnsuccessfulCommandException;

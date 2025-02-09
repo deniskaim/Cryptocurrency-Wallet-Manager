@@ -7,6 +7,7 @@ import exceptions.InvalidAssetException;
 import exceptions.wallet.MissingInWalletAssetException;
 import exceptions.wallet.NoActiveInvestmentsException;
 import coinapi.dto.Asset;
+import storage.AssetStorage;
 
 import java.util.List;
 import java.util.Map;

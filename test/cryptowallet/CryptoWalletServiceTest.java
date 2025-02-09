@@ -1,6 +1,5 @@
 package cryptowallet;
 
-import coinapi.client.CoinApiClient;
 import coinapi.dto.Asset;
 import cryptowallet.offers.CryptoCatalog;
 import cryptowallet.offers.Offering;
@@ -11,6 +10,7 @@ import exceptions.wallet.NoActiveInvestmentsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import storage.AssetStorage;
 
 import java.util.HashMap;
 import java.util.List;

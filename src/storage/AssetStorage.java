@@ -1,4 +1,4 @@
-package cryptowallet;
+package storage;
 
 import coinapi.client.CoinApiClient;
 import coinapi.dto.Asset;
@@ -18,6 +18,7 @@ public class AssetStorage implements AutoCloseable {
 
     private static final int MAX_ASSETS_COUNT = 50;
     private static final int UPDATE_CRYPTO_ASSETS_INTERVAL = 30; // в минути
+    private static final int FIRST_UPDATE_POINT = 30;
 
     private final CoinApiClient coinApiClient;
     private final Map<String, Asset> allAssets = new ConcurrentHashMap<>();
@@ -28,11 +29,8 @@ public class AssetStorage implements AutoCloseable {
             throw new IllegalArgumentException("coinApiClient cannot be null reference!");
         }
         this.coinApiClient = coinApiClient;
+        updateAssets();
         startUpdatingAssets();
-    }
-
-    private void startUpdatingAssets() {
-        scheduledExecutor.scheduleAtFixedRate(this::updateAssets, 0, UPDATE_CRYPTO_ASSETS_INTERVAL, TimeUnit.MINUTES);
     }
 
     public List<Asset> getAllAssets() {
@@ -47,6 +45,11 @@ public class AssetStorage implements AutoCloseable {
             throw new InvalidAssetException("There is no asset with this assetID!");
         }
         return allAssets.get(assetID);
+    }
+
+    private void startUpdatingAssets() {
+        scheduledExecutor.scheduleAtFixedRate(this::updateAssets, FIRST_UPDATE_POINT, UPDATE_CRYPTO_ASSETS_INTERVAL,
+            TimeUnit.MINUTES);
     }
 
     private void updateAssets() {
