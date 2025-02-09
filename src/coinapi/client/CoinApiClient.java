@@ -2,7 +2,6 @@ package coinapi.client;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
-import exceptions.InvalidAssetException;
 import exceptions.api.CryptoClientException;
 import exceptions.api.apikey.InvalidApiKeyException;
 import coinapi.dto.Asset;
@@ -13,15 +12,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import static java.lang.Math.min;
 
 public class CoinApiClient {
 

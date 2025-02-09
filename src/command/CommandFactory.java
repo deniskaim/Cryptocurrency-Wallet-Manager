@@ -69,8 +69,8 @@ public class CommandFactory {
             throw new IllegalArgumentException("selectionKey cannot be null!");
         }
         String[] stringsInCommandMessage = getSubstringsFromString(commandMessage);
-        String commandSymbol = stringsInCommandMessage[0];
-        validateCommandSymbol(commandSymbol);
+        validateCommandSymbol(stringsInCommandMessage[0]);
+        validateCommandLength(stringsInCommandMessage);
 
         String actualCommandString = stringsInCommandMessage[1];
         String[] args = Arrays.copyOfRange(stringsInCommandMessage, 2, stringsInCommandMessage.length);
@@ -89,6 +89,12 @@ public class CommandFactory {
             case HELP_MESSAGE -> createHelpCommand(args);
             default -> throw new InvalidCommandException("That is an invalid command. Try again!");
         };
+    }
+
+    private void validateCommandLength(String[] stringsInCommandMessage) throws InvalidCommandException {
+        if (stringsInCommandMessage.length == 1) {
+            throw new InvalidCommandException("The commands cannot consist of 1 symbol!");
+        }
     }
 
     private void validateCommandSymbol(String commandSymbol) throws InvalidCommandException {

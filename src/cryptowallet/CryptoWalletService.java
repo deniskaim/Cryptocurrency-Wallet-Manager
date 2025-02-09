@@ -26,7 +26,7 @@ public class CryptoWalletService {
     public CryptoCatalog getCryptoCatalogWithOfferings() {
         List<Asset> assets = assetStorage.getAllAssets();
         List<Offering> offerings = assets.stream()
-            .map(asset -> Offering.of(asset.assetID(), asset.price()))
+            .map(asset -> Offering.of(asset.assetID(), asset.name(), asset.price()))
             .toList();
 
         return new CryptoCatalog(offerings);

@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class CryptoWalletClient {
 
     private final int serverPort;
-    private static final String SERVER_HOST = "localhost";
+    private final String serverHost;
 
     private static final int BUFFER_SIZE = 2048;
     private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
@@ -18,13 +18,20 @@ public class CryptoWalletClient {
     private static final String WELCOME_MESSAGE =
         "Welcome to the Cryptocurrency Wallet Manager. Use the command \"$ help\" to see the functionalities!";
 
-    public CryptoWalletClient(int port) {
+    private static final String ENTER_COMMAND_MESSAGE = "Enter a command: ";
+    private static final String INVALID_COMMAND_MESSAGE = "Invalid command! Try again!";
+    private static final String DISCONNECTED_MESSAGE = "You have been disconnected from the server!";
+
+    public CryptoWalletClient(int port, String host) {
         this.serverPort = port;
+        this.serverHost = host;
     }
 
     public static void main(String[] args) {
         final int port = 8888;
-        CryptoWalletClient client = new CryptoWalletClient(port);
+        final String host = "localhost";
+
+        CryptoWalletClient client = new CryptoWalletClient(port, host);
         client.start();
     }
 
@@ -32,27 +39,24 @@ public class CryptoWalletClient {
         try (SocketChannel socketChannel = SocketChannel.open();
              Scanner scanner = new Scanner(System.in)) {
 
-            socketChannel.connect(new InetSocketAddress(SERVER_HOST, serverPort));
+            socketChannel.connect(new InetSocketAddress(serverHost, serverPort));
             System.out.println(WELCOME_MESSAGE);
             while (true) {
-                System.out.println("Enter a command: ");
+                System.out.println(ENTER_COMMAND_MESSAGE);
                 String clientMessage = scanner.nextLine();
 
-                if (!socketChannel.isConnected()) {
-                    break;
-                }
                 try {
                     writeToServer(socketChannel, clientMessage);
                     String replyFromServer = readFromServer(socketChannel);
+                    if (replyFromServer == null) {
+                        System.out.println(DISCONNECTED_MESSAGE);
+                        break;
+                    }
                     System.out.println(replyFromServer);
                     System.out.println();
-                } catch (IllegalStateException e) {
-                    System.out.println(e.getMessage());
-                    break;
-                } catch (RuntimeException e) {
-                    System.out.println("Invalid command!");
+                } catch (IllegalArgumentException e) {
+                    System.out.println(INVALID_COMMAND_MESSAGE);
                 }
-
             }
         } catch (IOException e) {
             System.out.println("Unable to connect to the server. Try again later!");
@@ -60,9 +64,6 @@ public class CryptoWalletClient {
     }
 
     private void writeToServer(SocketChannel socketChannel, String message) throws IOException {
-        if (socketChannel == null) {
-            throw new IllegalArgumentException("The socketChannel of the client is null reference!");
-        }
         if (message == null || message.isBlank()) {
             throw new IllegalArgumentException("The message the client wants to send is invalid!");
         }
@@ -74,14 +75,10 @@ public class CryptoWalletClient {
     }
 
     private String readFromServer(SocketChannel socketChannel) throws IOException {
-        if (socketChannel == null) {
-            throw new IllegalArgumentException("The socketChannel of the client is null reference!");
-        }
-
         buffer.clear();
         int resultRead = socketChannel.read(buffer);
         if (resultRead < 0) {
-            throw new IllegalStateException("You have been disconnected from the server!");
+            return null;
         }
 
         buffer.flip();

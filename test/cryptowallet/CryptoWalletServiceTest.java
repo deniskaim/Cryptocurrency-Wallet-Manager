@@ -34,9 +34,9 @@ public class CryptoWalletServiceTest {
         cryptoWalletService = new CryptoWalletService(assetStorage);
     }
 
-    private Asset createAsset(String assetID, double price) {
+    private Asset createAsset(String assetID, String name, double price) {
         return new Asset(
-            assetID, null, 1, null, null,
+            assetID, name, 1, null, null,
             null, null, null, null,
             null, null, null, null,
             null, null, price, null);
@@ -44,12 +44,13 @@ public class CryptoWalletServiceTest {
 
     @Test
     void testListOfferings() {
-        Asset customAsset1 = createAsset("customAsset1", 10.0);
-        Asset customAsset2 = createAsset("customAsset2", 20.0);
+        Asset customAsset1 = createAsset("customAsset1", "customAsset1", 10.0);
+        Asset customAsset2 = createAsset("customAsset2", "customAsset2", 20.0);
 
         when(assetStorage.getAllAssets()).thenReturn(List.of(customAsset1, customAsset2));
         List<Offering> expectedOfferings =
-            List.of(Offering.of("customAsset1", 10.0), Offering.of("customAsset2", 20.0));
+            List.of(Offering.of("customAsset1", "customAsset1", 10.0),
+                Offering.of("customAsset2", "customAsset2", 20.0));
 
         CryptoCatalog expectedCatalog = CryptoCatalog.of(expectedOfferings);
         CryptoCatalog resultCatalog = cryptoWalletService.getCryptoCatalogWithOfferings();
@@ -81,7 +82,7 @@ public class CryptoWalletServiceTest {
 
     @Test
     void testBuyCryptoWhenInsufficientFundsException() throws InsufficientFundsException, InvalidAssetException {
-        when(assetStorage.getAsset("customAsset1")).thenReturn(createAsset("customAsset1", 5));
+        when(assetStorage.getAsset("customAsset1")).thenReturn(createAsset("customAsset1", "customAsset1", 5));
         doThrow(InsufficientFundsException.class).when(cryptoWallet).withdrawMoney(10);
 
         assertThrows(InsufficientFundsException.class,
@@ -92,7 +93,7 @@ public class CryptoWalletServiceTest {
     @Test
     void testBuyCrypto() throws InvalidAssetException, InsufficientFundsException {
         final double assetPrice = 100;
-        when(assetStorage.getAsset("customAsset1")).thenReturn(createAsset("customAsset1", assetPrice));
+        when(assetStorage.getAsset("customAsset1")).thenReturn(createAsset("customAsset1", "customAsset1", assetPrice));
 
         final double expectedBoughtQuantity = 2.5;
         double boughtQuantity = cryptoWalletService.buyCrypto(250, "customAsset1", cryptoWallet);
@@ -128,7 +129,7 @@ public class CryptoWalletServiceTest {
     @Test
     void testSellCryptoWhenMissingInWalletAssetException() throws InvalidAssetException,
         MissingInWalletAssetException {
-        when(assetStorage.getAsset("customAsset1")).thenReturn(createAsset("customAsset1", 5));
+        when(assetStorage.getAsset("customAsset1")).thenReturn(createAsset("customAsset1", "customAsset1", 5));
         doThrow(MissingInWalletAssetException.class).when(cryptoWallet).removeInvestment("customAsset1");
 
         assertThrows(MissingInWalletAssetException.class,
@@ -139,7 +140,8 @@ public class CryptoWalletServiceTest {
     @Test
     void testSellCrypto() throws InvalidAssetException, MissingInWalletAssetException {
         final double currentAssetPrice = 100;
-        when(assetStorage.getAsset("customAsset1")).thenReturn(createAsset("customAsset1", currentAssetPrice));
+        when(assetStorage.getAsset("customAsset1")).thenReturn(
+            createAsset("customAsset1", "customAsset1", currentAssetPrice));
 
         final double assetQuantityInWallet = 2.5;
         when(cryptoWallet.removeInvestment("customAsset1")).thenReturn(assetQuantityInWallet);
@@ -182,8 +184,8 @@ public class CryptoWalletServiceTest {
 
         final double price1 = 6;
         final double price2 = 7;
-        when(assetStorage.getAsset("asset1")).thenReturn(createAsset("asset1", price1));
-        when(assetStorage.getAsset("asset2")).thenReturn(createAsset("asset2", price2));
+        when(assetStorage.getAsset("asset1")).thenReturn(createAsset("asset1", "asset1", price1));
+        when(assetStorage.getAsset("asset2")).thenReturn(createAsset("asset2", "asset2", price2));
 
         double expectedProfit = 6;
         double result = cryptoWalletService.accumulateProfitLoss(cryptoWallet);

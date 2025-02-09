@@ -14,8 +14,10 @@ public record CryptoCatalog(List<Offering> offerings) {
     public String toString() {
         StringBuilder result = new StringBuilder(HEADER_MESSAGE);
         for (int i = 0; i < offerings.size(); i++) {
-            result.append(offerings.get(i).assetID()).append(" ")
-                .append(offerings.get(i).price());
+            Offering offering = offerings.get(i);
+            result.append(offering.assetID()).append(", ")
+                .append(offering.assetName()).append(": ")
+                .append(offering.price()).append(" USD");
             if (i != offerings.size() - 1) {
                 result.append(System.lineSeparator());
             }
