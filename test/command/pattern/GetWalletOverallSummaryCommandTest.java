@@ -59,43 +59,10 @@ public class GetWalletOverallSummaryCommandTest {
     void testExecuteWhenNoActiveInvestments() throws NoActiveInvestmentsException, InvalidAssetException {
         when(selectionKey.attachment()).thenReturn(user);
         when(user.cryptoWallet()).thenReturn(cryptoWallet);
-        when(cryptoWalletService.accumulateProfitLoss(cryptoWallet)).thenThrow(NoActiveInvestmentsException.class);
+        when(cryptoWalletService.getWalletOverallSummary(cryptoWallet)).thenThrow(NoActiveInvestmentsException.class);
 
         assertThrows(UnsuccessfulCommandException.class, () -> command.execute(),
             "An UnsuccessfulCommandException is expected when there are no active investments in the account");
-    }
-
-    @Test
-    void testExecuteShouldReturnProfitMessageWhenTotalProfitIsPositive()
-        throws UnsuccessfulCommandException, InvalidAssetException, NoActiveInvestmentsException {
-        when(selectionKey.attachment()).thenReturn(user);
-        when(user.cryptoWallet()).thenReturn(cryptoWallet);
-        when(cryptoWalletService.accumulateProfitLoss(cryptoWallet)).thenReturn(10.0);  // Печалба
-
-        String result = command.execute();
-        assertEquals("Your investments have grown! Current profit: 10.000000 USD", result);
-    }
-
-    @Test
-    void testExecuteShouldReturnLossMessageWhenTotalProfitIsNegative()
-        throws UnsuccessfulCommandException, InvalidAssetException, NoActiveInvestmentsException {
-        when(selectionKey.attachment()).thenReturn(user);
-        when(user.cryptoWallet()).thenReturn(cryptoWallet);
-        when(cryptoWalletService.accumulateProfitLoss(cryptoWallet)).thenReturn(-10.0);  // Загуба
-
-        String result = command.execute();
-        assertEquals("Current loss: -10.000000 USD. Investing always carries risks! Be patient!", result);
-    }
-
-    @Test
-    void testExecuteShouldReturnNeutralMessageWhenTotalProfitIsZero()
-        throws UnsuccessfulCommandException, InvalidAssetException, NoActiveInvestmentsException {
-        when(selectionKey.attachment()).thenReturn(user);
-        when(user.cryptoWallet()).thenReturn(cryptoWallet);
-        when(cryptoWalletService.accumulateProfitLoss(cryptoWallet)).thenReturn(0.0);  // Няма печалба или загуба
-
-        String result = command.execute();
-        assertEquals("No profit or loss at the moment. Your investments are safe!", result);
     }
 
 }

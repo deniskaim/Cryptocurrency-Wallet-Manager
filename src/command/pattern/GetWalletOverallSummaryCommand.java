@@ -1,5 +1,6 @@
 package command.pattern;
 
+import cryptowallet.summary.CryptoWalletOverallSummary;
 import exceptions.InvalidAssetException;
 import exceptions.command.UnsuccessfulCommandException;
 import exceptions.wallet.NoActiveInvestmentsException;
@@ -13,10 +14,6 @@ public class GetWalletOverallSummaryCommand implements Command {
 
     private final CryptoWalletService cryptoWalletService;
     private final SelectionKey selectionKey;
-
-    private static final String PROFIT_MESSAGE = "Your investments have grown! Current profit: %f USD";
-    private static final String LOSS_MESSAGE = "Current loss: %f USD. Investing always carries risks! Be patient!";
-    private static final String NEUTRAL_MESSAGE = "No profit or loss at the moment. Your investments are safe!";
 
     public GetWalletOverallSummaryCommand(CryptoWalletService cryptoWalletService,
                                           SelectionKey selectionKey) {
@@ -39,21 +36,12 @@ public class GetWalletOverallSummaryCommand implements Command {
             if (user == null) {
                 throw new NotLoggedInException("Get-wallet-overall-summary cannot happen before logging in!");
             }
-            double totalProfitLoss = cryptoWalletService.accumulateProfitLoss(user.cryptoWallet());
-            return getCorrectResponse(totalProfitLoss);
+            CryptoWalletOverallSummary cryptoWalletOverallSummary =
+                cryptoWalletService.getWalletOverallSummary(user.cryptoWallet());
+            return cryptoWalletOverallSummary.toString();
         } catch (NotLoggedInException | NoActiveInvestmentsException | InvalidAssetException e) {
             throw new UnsuccessfulCommandException(
                 "GetWalletOverallSummary command is not successful! " + e.getMessage(), e);
-        }
-    }
-
-    private String getCorrectResponse(double totalProfitLoss) {
-        if (Double.compare(totalProfitLoss, 0d) > 0) {
-            return String.format(PROFIT_MESSAGE, totalProfitLoss);
-        } else if (Double.compare(totalProfitLoss, 0d) < 0) {
-            return String.format(LOSS_MESSAGE, totalProfitLoss);
-        } else {
-            return NEUTRAL_MESSAGE;
         }
     }
 }

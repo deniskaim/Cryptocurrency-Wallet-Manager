@@ -131,11 +131,17 @@ public class CryptoWalletTest {
     }
 
     @Test
-    void testGetInvestedMoney() {
+    void testGetInvestedMoneyInCryptoByAssetIDWhenNull() {
+        assertThrows(IllegalArgumentException.class, () -> cryptoWallet.getInvestedMoneyInCryptoByAssetID(null),
+            "An IllegalArgumentException is expected when assetID is null reference!");
+    }
+
+    @Test
+    void testGetInvestedMoneyInCryptoByAssetID() {
         CryptoWallet cryptoWalletTest = new CryptoWallet(0, getHoldings(), getInvestmentsHistory());
 
         final double expectedMoney = 100;
-        double result = cryptoWalletTest.getInvestedMoney();
+        double result = cryptoWalletTest.getInvestedMoneyInCryptoByAssetID("assetID");
         assertEquals(expectedMoney, result, "getInvestedMoney() does not return the correct invested amount!");
     }
 

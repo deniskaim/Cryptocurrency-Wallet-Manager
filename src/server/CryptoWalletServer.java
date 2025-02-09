@@ -51,7 +51,7 @@ public class CryptoWalletServer {
     }
 
     public static void main(String[] args) {
-        final int port = 8888;
+        final int port = 2468;
         CryptoWalletServer cryptoWalletServer = new CryptoWalletServer(port);
         cryptoWalletServer.start();
     }
@@ -105,9 +105,6 @@ public class CryptoWalletServer {
 
             if (selectionKey.isReadable()) {
                 handleReadableSelectionKey(selectionKey);
-                if (!selectionKey.channel().isOpen()) {
-                    continue;
-                }
             } else if (selectionKey.isAcceptable()) {
                 handleAcceptableSelectionKey(selectionKey);
             }

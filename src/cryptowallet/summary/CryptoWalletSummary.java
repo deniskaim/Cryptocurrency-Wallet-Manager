@@ -1,4 +1,4 @@
-package cryptowallet;
+package cryptowallet.summary;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +24,7 @@ public record CryptoWalletSummary(double balance, Map<String, Double> holdings) 
         return summary.toString();
     }
 
-    static CryptoWalletSummary of(double balance, Map<String, Double> holdings) {
+    public static CryptoWalletSummary of(double balance, Map<String, Double> holdings) {
         return new CryptoWalletSummary(balance, new HashMap<>(holdings));
     }
 }

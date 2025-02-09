@@ -1,6 +1,6 @@
 package command.pattern;
 
-import cryptowallet.CryptoWalletSummary;
+import cryptowallet.summary.CryptoWalletSummary;
 import exceptions.command.UnsuccessfulCommandException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

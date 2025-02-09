@@ -1,4 +1,4 @@
-package cryptowallet;
+package cryptowallet.summary;
 
 import org.junit.jupiter.api.Test;
 

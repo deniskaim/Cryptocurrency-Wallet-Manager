@@ -63,7 +63,10 @@ public class CommandFactory {
     public Command createCommand(String commandMessage, SelectionKey selectionKey)
         throws InvalidCommandException, IncorrectArgumentsCountException {
         if (commandMessage == null) {
-            throw new IllegalArgumentException("commandMessage cannot be null reference");
+            throw new IllegalArgumentException("commandMessage cannot be null reference or blank!");
+        }
+        if (commandMessage.isEmpty()) {
+            throw new InvalidCommandException("commandMessage cannot be empty!");
         }
         if (selectionKey == null) {
             throw new IllegalArgumentException("selectionKey cannot be null!");
@@ -74,6 +77,12 @@ public class CommandFactory {
 
         String actualCommandString = stringsInCommandMessage[1];
         String[] args = Arrays.copyOfRange(stringsInCommandMessage, 2, stringsInCommandMessage.length);
+
+        return createCommandFromParameters(actualCommandString, args, selectionKey);
+    }
+
+    private Command createCommandFromParameters(String actualCommandString, String[] args, SelectionKey selectionKey)
+        throws IncorrectArgumentsCountException, InvalidCommandException {
         return switch (actualCommandString) {
             case REGISTER_MESSAGE -> createRegisterCommand(args);
             case LOG_IN_MESSAGE -> createLogInCommand(args, selectionKey);

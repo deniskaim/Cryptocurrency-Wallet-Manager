@@ -2,6 +2,7 @@ package cryptowallet;
 
 import cryptowallet.offers.CryptoCatalog;
 import cryptowallet.offers.Offering;
+import cryptowallet.summary.CryptoWalletOverallSummary;
 import exceptions.wallet.InsufficientFundsException;
 import exceptions.InvalidAssetException;
 import exceptions.wallet.MissingInWalletAssetException;
@@ -9,6 +10,7 @@ import exceptions.wallet.NoActiveInvestmentsException;
 import coinapi.dto.Asset;
 import storage.AssetStorage;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -64,7 +66,7 @@ public class CryptoWalletService {
         return income;
     }
 
-    public double accumulateProfitLoss(CryptoWallet cryptoWallet)
+    public CryptoWalletOverallSummary getWalletOverallSummary(CryptoWallet cryptoWallet)
         throws NoActiveInvestmentsException, InvalidAssetException {
         validateCryptoWallet(cryptoWallet);
 
@@ -73,17 +75,22 @@ public class CryptoWalletService {
             throw new NoActiveInvestmentsException("There are no active investments in the wallet!");
         }
 
-        double investedValue = cryptoWallet.getInvestedMoney();
+        Map<String, Double> assetsProfit = new HashMap<>();
 
-        double estimatedSellValue = 0;
+        double overallProfit = 0;
         for (String assetID : accountHoldings.keySet()) {
             double currentAssetQuantity = accountHoldings.get(assetID);
-            double currentAssetPrice = getAssetByAssetID(assetID).price();
+            double assetPrice = getAssetByAssetID(assetID).price();
 
-            estimatedSellValue += currentAssetPrice * currentAssetQuantity;
+            double investedMoneyInCryptoAsset = cryptoWallet.getInvestedMoneyInCryptoByAssetID(assetID);
+            double sellValueOfCryptoAsset = assetPrice * currentAssetQuantity;
+            double profit = sellValueOfCryptoAsset - investedMoneyInCryptoAsset;
+
+            assetsProfit.put(assetID, profit);
+            overallProfit += profit;
         }
 
-        return estimatedSellValue - investedValue;
+        return new CryptoWalletOverallSummary(overallProfit, assetsProfit);
     }
 
     private void validateCryptoWallet(CryptoWallet cryptoWallet) {

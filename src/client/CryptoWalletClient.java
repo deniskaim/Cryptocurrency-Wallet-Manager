@@ -28,7 +28,7 @@ public class CryptoWalletClient {
     }
 
     public static void main(String[] args) {
-        final int port = 8888;
+        final int port = 2468;
         final String host = "localhost";
 
         CryptoWalletClient client = new CryptoWalletClient(port, host);
@@ -60,12 +60,17 @@ public class CryptoWalletClient {
             }
         } catch (IOException e) {
             System.out.println("Unable to connect to the server. Try again later!");
+        } catch (Exception e) {
+            System.out.println("A problem with the connection to the server has occurred!");
         }
     }
 
     private void writeToServer(SocketChannel socketChannel, String message) throws IOException {
-        if (message == null || message.isBlank()) {
+        if (message == null) {
             throw new IllegalArgumentException("The message the client wants to send is invalid!");
+        }
+        if (message.isBlank()) {
+            message = System.lineSeparator();
         }
 
         buffer.clear();

@@ -3,6 +3,7 @@ package cryptowallet;
 import coinapi.dto.Asset;
 import cryptowallet.offers.CryptoCatalog;
 import cryptowallet.offers.Offering;
+import cryptowallet.summary.CryptoWalletOverallSummary;
 import exceptions.InvalidAssetException;
 import exceptions.wallet.InsufficientFundsException;
 import exceptions.wallet.MissingInWalletAssetException;
@@ -155,32 +156,32 @@ public class CryptoWalletServiceTest {
     }
 
     @Test
-    void testAccumulateProfitLossNullCryptoWallet() {
+    void testGetWalletOverallSummaryNullCryptoWallet() {
         assertThrows(IllegalArgumentException.class,
-            () -> cryptoWalletService.accumulateProfitLoss(null),
+            () -> cryptoWalletService.getWalletOverallSummary(null),
             "An IllegalArgumentException is expected when cryptoWallet is null reference!");
     }
 
     @Test
-    void testAccumulateProfitLossWhenNoActiveInvestments() {
+    void testGetWalletOverallSummaryWhenNoActiveInvestments() {
         Map<String, Double> emptyHoldings = new HashMap<>();
         when(cryptoWallet.getHoldings()).thenReturn(emptyHoldings);
 
         assertThrows(NoActiveInvestmentsException.class,
-            () -> cryptoWalletService.accumulateProfitLoss(cryptoWallet),
+            () -> cryptoWalletService.getWalletOverallSummary(cryptoWallet),
             "A NoActiveInvestmentsException is expected when there are no investments!");
 
     }
 
     @Test
-    void testAccumulateProfitLoss() throws InvalidAssetException, NoActiveInvestmentsException {
+    void testGetWalletOverallSummary() throws InvalidAssetException, NoActiveInvestmentsException {
         Map<String, Double> holdings = new HashMap<>();
         holdings.put("asset1", 1.5);
         holdings.put("asset2", 1d);
         when(cryptoWallet.getHoldings()).thenReturn(holdings);
 
-        final double investedMoney = 10d;
-        when(cryptoWallet.getInvestedMoney()).thenReturn(investedMoney);
+        when(cryptoWallet.getInvestedMoneyInCryptoByAssetID("asset1")).thenReturn(4d);
+        when(cryptoWallet.getInvestedMoneyInCryptoByAssetID("asset2")).thenReturn(6d);
 
         final double price1 = 6;
         final double price2 = 7;
@@ -188,7 +189,12 @@ public class CryptoWalletServiceTest {
         when(assetStorage.getAsset("asset2")).thenReturn(createAsset("asset2", "asset2", price2));
 
         double expectedProfit = 6;
-        double result = cryptoWalletService.accumulateProfitLoss(cryptoWallet);
-        assertEquals(expectedProfit, result, "accumulateProfitLoss() doesn't calculate correctly!");
+
+        CryptoWalletOverallSummary result = cryptoWalletService.getWalletOverallSummary(cryptoWallet);
+        assertEquals(expectedProfit, result.getOverallProfitLoss(),
+            "getWalletOverallSummary doesn't calculate the profit correctly!");
+
+        assertEquals(expectedProfit, result.getAssetsProfit().get("asset1") + result.getAssetsProfit().get("asset2"),
+            "getWalletOverallSummary doesn't calculate the profit of the investments correctly!");
     }
 }

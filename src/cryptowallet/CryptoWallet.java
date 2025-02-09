@@ -1,5 +1,6 @@
 package cryptowallet;
 
+import cryptowallet.summary.CryptoWalletSummary;
 import exceptions.wallet.InsufficientFundsException;
 import exceptions.wallet.MissingInWalletAssetException;
 
@@ -79,9 +80,14 @@ public class CryptoWallet implements Serializable {
         return CryptoWalletSummary.of(balance, holdings);
     }
 
-    public double getInvestedMoney() {
+    public double getInvestedMoneyInCryptoByAssetID(String assetID) {
+        if (assetID == null) {
+            throw new IllegalArgumentException("assetID cannot be null reference!");
+        }
+
         return investmentsHistory.values().stream()
             .flatMap(List::stream)
+            .filter(investment -> investment.assetID().equals(assetID))
             .mapToDouble(investment -> investment.purchasedQuantity() * investment.assetPrice())
             .sum();
     }
